@@ -1,0 +1,3184 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Parking Manager Pro - APK</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+        }
+
+        body {
+            background: #f0f2f5;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 0;
+            margin: 0;
+        }
+
+        .app-container {
+            max-width: 480px;
+            width: 100%;
+            background: #ffffff;
+            border-radius: 0;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.12);
+            overflow: hidden;
+            position: relative;
+            min-height: 100vh;
+        }
+
+        @media (min-width: 481px) {
+            .app-container {
+                border-radius: 32px;
+                min-height: 700px;
+                margin: 16px auto;
+            }
+        }
+
+        .screen {
+            display: none;
+            padding: 20px 18px 30px;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .screen.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(12px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .top-bar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 20px;
+            padding: 0 4px;
+        }
+
+        .top-bar h2 {
+            font-size: 22px;
+            font-weight: 700;
+            color: #0f172a;
+            letter-spacing: -0.5px;
+        }
+
+        .back-btn {
+            background: none;
+            border: none;
+            font-size: 24px;
+            color: #64748b;
+            padding: 4px 8px;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .btn {
+            border: none;
+            padding: 14px 20px;
+            border-radius: 16px;
+            font-size: 17px;
+            font-weight: 600;
+            width: 100%;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .btn:active {
+            transform: scale(0.96);
+        }
+
+        .btn-primary {
+            background: #2563eb;
+            color: white;
+        }
+
+        .btn-success {
+            background: #16a34a;
+            color: white;
+        }
+
+        .btn-danger {
+            background: #dc2626;
+            color: white;
+        }
+
+        .btn-warning {
+            background: #f59e0b;
+            color: #0f172a;
+        }
+
+        .btn-outline {
+            background: transparent;
+            border: 2px solid #e2e8f0;
+            color: #475569;
+        }
+
+        .btn-sm {
+            padding: 10px 16px;
+            font-size: 14px;
+        }
+
+        .btn-xs {
+            padding: 6px 12px;
+            font-size: 12px;
+            border-radius: 10px;
+        }
+
+        .btn-saloon {
+            background: linear-gradient(135deg, #8b5cf6, #7c3aed);
+            color: white;
+            box-shadow: 0 4px 16px rgba(139, 92, 246, 0.4);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-saloon .stamp {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            background: #f59e0b;
+            color: #0f172a;
+            font-size: 9px;
+            font-weight: 800;
+            padding: 4px 10px;
+            border-radius: 30px;
+            transform: rotate(15deg);
+            border: 2px solid #0f172a;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+            letter-spacing: 1px;
+        }
+
+        .grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-top: 12px;
+        }
+
+        .card {
+            background: #f8fafc;
+            border-radius: 16px;
+            padding: 16px;
+            margin-bottom: 16px;
+            border: 1px solid #e9edf2;
+            transition: 0.2s;
+        }
+
+        label {
+            display: block;
+            font-size: 14px;
+            font-weight: 500;
+            color: #334155;
+            margin-top: 14px;
+            margin-bottom: 5px;
+        }
+
+        input,
+        select,
+        textarea {
+            width: 100%;
+            padding: 12px 14px;
+            border-radius: 12px;
+            border: 1.5px solid #d1d9e6;
+            font-size: 16px;
+            background: white;
+            transition: 0.2s;
+        }
+
+        input:focus,
+        select:focus,
+        textarea:focus {
+            border-color: #2563eb;
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+        }
+
+        textarea {
+            min-height: 60px;
+            resize: vertical;
+        }
+
+        .printer-status {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+            color: #475569;
+            background: #f1f5f9;
+            padding: 6px 14px;
+            border-radius: 30px;
+        }
+
+        .status-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            display: inline-block;
+        }
+
+        .status-dot.on {
+            background: #16a34a;
+        }
+
+        .status-dot.off {
+            background: #dc2626;
+        }
+
+        .status-dot.connecting {
+            background: #f59e0b;
+            animation: pulse 1s infinite;
+        }
+
+        @keyframes pulse {
+            0%,
+            100% {
+                opacity: 0.4;
+            }
+            50% {
+                opacity: 1;
+            }
+        }
+
+        .qr-container {
+            display: flex;
+            justify-content: center;
+            margin: 12px 0;
+            padding: 16px;
+            background: white;
+            border-radius: 16px;
+            border: 2px dashed #e2e8f0;
+        }
+
+        #qrcode img {
+            display: block;
+            margin: 0 auto;
+        }
+
+        .ticket-preview {
+            background: #f8fafc;
+            border-radius: 12px;
+            padding: 20px;
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+            line-height: 1.8;
+            white-space: pre-wrap;
+            word-break: break-all;
+            border: 2px solid #2563eb;
+            max-width: 280px;
+            margin: 0 auto;
+        }
+
+        .ticket-preview-salao {
+            background: #f8fafc;
+            border-radius: 12px;
+            padding: 20px;
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+            line-height: 1.8;
+            white-space: pre-wrap;
+            word-break: break-all;
+            border: 3px solid #8b5cf6;
+            max-width: 280px;
+            margin: 0 auto;
+            position: relative;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 4px;
+            background: #f1f5f9;
+            border-radius: 14px;
+            padding: 4px;
+            margin-bottom: 16px;
+        }
+
+        .tab {
+            flex: 1;
+            text-align: center;
+            padding: 10px 0;
+            border-radius: 12px;
+            font-weight: 500;
+            font-size: 14px;
+            color: #64748b;
+            cursor: pointer;
+            transition: 0.2s;
+            background: transparent;
+            border: none;
+        }
+
+        .tab.active {
+            background: white;
+            color: #0f172a;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+        }
+
+        .history-item {
+            background: white;
+            border-radius: 12px;
+            padding: 12px 14px;
+            margin-bottom: 8px;
+            border: 1px solid #e9edf2;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .history-item .info {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+
+        .history-item .info strong {
+            font-size: 15px;
+            color: #0f172a;
+        }
+
+        .history-item .info span {
+            font-size: 13px;
+            color: #64748b;
+        }
+
+        .history-item .value {
+            font-weight: 700;
+            color: #0f172a;
+            font-size: 16px;
+        }
+
+        .cash-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 8px;
+        }
+
+        .cash-item {
+            background: #f1f5f9;
+            border-radius: 12px;
+            padding: 12px;
+            text-align: center;
+        }
+
+        .cash-item .label {
+            font-size: 11px;
+            color: #64748b;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-weight: 600;
+        }
+
+        .cash-item .amount {
+            font-size: 18px;
+            font-weight: 700;
+            color: #0f172a;
+            margin-top: 4px;
+        }
+
+        .photo-list {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin: 8px 0;
+        }
+
+        .photo-thumb {
+            width: 80px;
+            height: 80px;
+            border-radius: 12px;
+            overflow: hidden;
+            border: 2px solid #e9edf2;
+            position: relative;
+            background: #f1f5f9;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .photo-thumb img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .photo-thumb .remove-photo {
+            position: absolute;
+            top: -6px;
+            right: -6px;
+            background: #dc2626;
+            color: white;
+            border-radius: 50%;
+            width: 22px;
+            height: 22px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            cursor: pointer;
+            border: 2px solid white;
+            font-weight: 700;
+        }
+
+        .photo-thumb .camera-placeholder {
+            color: #94a3b8;
+            font-size: 28px;
+        }
+
+        #camera-input,
+        #camera-input-salao {
+            display: none;
+        }
+
+        .scroll-content {
+            max-height: 65vh;
+            overflow-y: auto;
+            padding-right: 4px;
+        }
+
+        .scroll-content::-webkit-scrollbar {
+            width: 4px;
+        }
+
+        .scroll-content::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 8px;
+        }
+
+        .badge {
+            background: #2563eb;
+            color: white;
+            border-radius: 30px;
+            padding: 2px 12px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .badge-success {
+            background: #16a34a;
+        }
+
+        .badge-salao-tag {
+            background: #8b5cf6;
+            color: white;
+        }
+
+        @media (max-width: 400px) {
+            .app-container {
+                border-radius: 0;
+            }
+            .cash-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+
+        .toast {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #0f172a;
+            color: white;
+            padding: 14px 24px;
+            border-radius: 16px;
+            font-weight: 500;
+            z-index: 999999;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+            animation: slideUp 0.3s ease;
+            max-width: 90%;
+            text-align: center;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateX(-50%) translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(-50%) translateY(0);
+            }
+        }
+
+        .toast-success {
+            background: #16a34a;
+        }
+
+        .toast-error {
+            background: #dc2626;
+        }
+
+        .toast-info {
+            background: #2563eb;
+        }
+
+        .filters-row {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+            margin-bottom: 12px;
+        }
+
+        .filters-row .btn {
+            width: auto;
+            flex: 1;
+            min-width: 60px;
+        }
+
+        .main-header {
+            text-align: center;
+            padding: 10px 0 15px 0;
+        }
+
+        .main-header h1 {
+            font-size: 28px;
+            font-weight: 800;
+            color: #0f172a;
+            letter-spacing: -1px;
+        }
+
+        .main-header .subtitle {
+            font-size: 13px;
+            color: #64748b;
+            margin-top: 2px;
+            font-weight: 500;
+        }
+
+        .main-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-top: 10px;
+        }
+
+        .main-buttons .btn {
+            font-size: 24px;
+            padding: 24px 20px;
+            border-radius: 18px;
+            font-weight: 700;
+            letter-spacing: 1px;
+        }
+
+        .main-buttons .btn-success {
+            background: linear-gradient(135deg, #22c55e, #16a34a);
+            box-shadow: 0 8px 24px rgba(22, 163, 74, 0.3);
+        }
+
+        .main-buttons .btn-danger {
+            background: linear-gradient(135deg, #ef4444, #dc2626);
+            box-shadow: 0 8px 24px rgba(220, 38, 38, 0.3);
+        }
+
+        .main-buttons .btn:active {
+            transform: scale(0.97);
+        }
+
+        .main-footer-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 8px;
+            margin-top: 16px;
+        }
+
+        .main-footer-grid .btn {
+            font-size: 13px;
+            padding: 12px 8px;
+            border-radius: 12px;
+            background: #f1f5f9;
+            color: #475569;
+            border: none;
+            font-weight: 600;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .main-footer-grid .btn i {
+            font-size: 18px;
+        }
+
+        .main-footer-grid .btn:hover {
+            background: #e2e8f0;
+        }
+
+        .main-footer-grid .btn-primary {
+            background: #2563eb;
+            color: white;
+        }
+
+        .main-footer-grid .btn-warning {
+            background: #f59e0b;
+            color: #0f172a;
+        }
+
+        .status-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 12px;
+            background: #f8fafc;
+            border-radius: 12px;
+            border: 1px solid #e9edf2;
+            margin-top: 12px;
+            font-size: 12px;
+            color: #64748b;
+        }
+
+        .status-bar .stat-item {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .status-bar .stat-item strong {
+            color: #0f172a;
+        }
+
+        .camera-btn {
+            background: linear-gradient(135deg, #2563eb, #1d4ed8);
+            color: white;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: 0.2s;
+        }
+
+        .camera-btn-salao {
+            background: linear-gradient(135deg, #8b5cf6, #7c3aed);
+            color: white;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: 0.2s;
+            border: 2px solid #6d28d9;
+        }
+
+        .ticket-sample {
+            background: #f8fafc;
+            border-radius: 12px;
+            padding: 16px;
+            max-width: 220px;
+            margin: 0 auto;
+            border: 2px solid #2563eb;
+        }
+
+        .ticket-sample .header {
+            text-align: center;
+            font-weight: 700;
+            font-size: 14px;
+            border-bottom: 2px solid #2563eb;
+            padding-bottom: 6px;
+            margin-bottom: 6px;
+        }
+
+        .ticket-sample .header .sub {
+            font-size: 10px;
+            font-weight: 400;
+            color: #64748b;
+        }
+
+        .ticket-sample .row {
+            display: flex;
+            justify-content: space-between;
+            font-size: 11px;
+            padding: 2px 0;
+        }
+
+        .ticket-sample .row .label {
+            color: #64748b;
+        }
+
+        .ticket-sample .row .value {
+            font-weight: 600;
+        }
+
+        .ticket-sample .divider {
+            border-top: 1px dashed #94a3b8;
+            margin: 4px 0;
+        }
+
+        .ticket-sample .plate {
+            background: #1e293b;
+            color: #f8fafc;
+            text-align: center;
+            padding: 4px;
+            border-radius: 4px;
+            font-size: 16px;
+            font-weight: 700;
+            letter-spacing: 3px;
+            margin: 4px 0;
+        }
+
+        .ticket-sample .qr {
+            display: flex;
+            justify-content: center;
+            margin: 4px 0;
+        }
+
+        .ticket-sample .qr img {
+            width: 60px !important;
+            height: 60px !important;
+        }
+
+        .ticket-sample .footer {
+            text-align: center;
+            font-size: 9px;
+            color: #94a3b8;
+            border-top: 2px solid #2563eb;
+            padding-top: 6px;
+            margin-top: 6px;
+        }
+
+        .car-example-photo {
+            width: 100%;
+            height: 60px;
+            background: linear-gradient(135deg, #1e293b, #334155);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 28px;
+            margin: 4px 0;
+            border: 2px solid #475569;
+        }
+
+        .salao-screen {
+            display: none;
+            padding: 20px 18px 30px;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .salao-screen.active {
+            display: block;
+        }
+
+        .salao-badge {
+            display: inline-block;
+            background: #8b5cf6;
+            color: white;
+            padding: 4px 16px;
+            border-radius: 30px;
+            font-size: 12px;
+            font-weight: 700;
+            letter-spacing: 1px;
+            border: 2px solid #6d28d9;
+        }
+
+        .salao-header {
+            background: linear-gradient(135deg, #8b5cf6, #7c3aed);
+            color: white;
+            padding: 12px 16px;
+            border-radius: 16px;
+            text-align: center;
+            margin-bottom: 16px;
+        }
+
+        .salao-header h2 {
+            font-size: 20px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .salao-header .stamp-badge {
+            background: #f59e0b;
+            color: #0f172a;
+            font-size: 11px;
+            font-weight: 800;
+            padding: 4px 14px;
+            border-radius: 30px;
+            border: 2px solid #0f172a;
+            display: inline-block;
+            margin-top: 4px;
+            letter-spacing: 1px;
+        }
+
+        .ticket-salao-preview {
+            background: #faf5ff;
+            border-radius: 12px;
+            padding: 20px;
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+            line-height: 1.8;
+            white-space: pre-wrap;
+            word-break: break-all;
+            border: 3px solid #8b5cf6;
+            max-width: 280px;
+            margin: 0 auto;
+            position: relative;
+        }
+
+        .photo-list-salao {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin: 8px 0;
+        }
+
+        .photo-list-salao .photo-thumb {
+            width: 80px;
+            height: 80px;
+            border-radius: 12px;
+            overflow: hidden;
+            border: 2px solid #8b5cf6;
+            position: relative;
+            background: #f1f5f9;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .photo-list-salao .photo-thumb img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .photo-list-salao .photo-thumb .remove-photo {
+            position: absolute;
+            top: -6px;
+            right: -6px;
+            background: #dc2626;
+            color: white;
+            border-radius: 50%;
+            width: 22px;
+            height: 22px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            cursor: pointer;
+            border: 2px solid white;
+            font-weight: 700;
+        }
+
+        /* Bluetooth */
+        .bluetooth-list {
+            max-height: 250px;
+            overflow-y: auto;
+            margin: 8px 0;
+        }
+
+        .bluetooth-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 14px;
+            background: white;
+            border-radius: 12px;
+            margin-bottom: 8px;
+            border: 2px solid #e2e8f0;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .bluetooth-item:hover {
+            background: #f1f5f9;
+            border-color: #2563eb;
+        }
+
+        .bluetooth-item .device-info {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+
+        .bluetooth-item .device-name {
+            font-weight: 600;
+            font-size: 14px;
+            color: #0f172a;
+        }
+
+        .bluetooth-item .device-mac {
+            font-size: 12px;
+            color: #94a3b8;
+        }
+
+        .bluetooth-item .status-badge {
+            font-size: 11px;
+            padding: 4px 14px;
+            border-radius: 30px;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+
+        .bluetooth-item .status-badge.connected {
+            background: #dcfce7;
+            color: #16a34a;
+        }
+
+        .bluetooth-item .status-badge.disconnected {
+            background: #fee2e2;
+            color: #dc2626;
+        }
+
+        .bluetooth-item .status-badge.connecting {
+            background: #fef3c7;
+            color: #d97706;
+            animation: pulse 1s infinite;
+        }
+
+        .btn-bluetooth {
+            background: #2563eb;
+            color: white;
+            border: none;
+            padding: 10px 16px;
+            border-radius: 10px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-bluetooth:hover {
+            background: #1d4ed8;
+        }
+
+        .btn-bluetooth:active {
+            transform: scale(0.95);
+        }
+
+        .btn-bluetooth-danger {
+            background: #dc2626;
+        }
+
+        .btn-bluetooth-danger:hover {
+            background: #b91c1c;
+        }
+
+        .btn-bluetooth-success {
+            background: #16a34a;
+        }
+
+        .btn-bluetooth-success:hover {
+            background: #15803d;
+        }
+
+        .btn-bluetooth-warning {
+            background: #f59e0b;
+            color: #0f172a;
+        }
+
+        .btn-bluetooth-warning:hover {
+            background: #d97706;
+        }
+
+        .bluetooth-scanning {
+            text-align: center;
+            padding: 30px 20px;
+            color: #64748b;
+        }
+
+        .bluetooth-scanning i {
+            font-size: 36px;
+            color: #2563eb;
+            display: block;
+            margin-bottom: 12px;
+        }
+
+        .bluetooth-info-box {
+            background: #dbeafe;
+            border: 2px solid #2563eb;
+            border-radius: 12px;
+            padding: 16px;
+            margin: 12px 0;
+            text-align: center;
+        }
+
+        .bluetooth-info-box i {
+            font-size: 28px;
+            color: #2563eb;
+            display: block;
+            margin-bottom: 8px;
+        }
+
+        .bluetooth-info-box h4 {
+            color: #0f172a;
+            margin-bottom: 4px;
+        }
+
+        .bluetooth-info-box p {
+            font-size: 13px;
+            color: #475569;
+        }
+
+        .bluetooth-info-box .btn {
+            margin-top: 8px;
+            font-size: 14px;
+            padding: 10px;
+            background: #2563eb;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .bluetooth-info-box .btn:active {
+            transform: scale(0.95);
+        }
+
+        .add-printer-form {
+            background: #f1f5f9;
+            border-radius: 12px;
+            padding: 12px;
+            margin-top: 8px;
+            display: none;
+        }
+
+        .add-printer-form.show {
+            display: block;
+        }
+
+        .add-printer-form .form-row {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 8px;
+            flex-wrap: wrap;
+        }
+
+        .add-printer-form .form-row input {
+            flex: 1;
+            padding: 8px 12px;
+            border: 1.5px solid #d1d9e6;
+            border-radius: 8px;
+            font-size: 14px;
+            min-width: 120px;
+        }
+
+        .add-printer-form .form-row .btn {
+            width: auto;
+            padding: 8px 16px;
+            font-size: 13px;
+        }
+
+        .printer-mac-highlight {
+            background: #fef3c7;
+            border: 2px solid #f59e0b;
+            border-radius: 12px;
+            padding: 12px;
+            margin: 8px 0;
+            text-align: center;
+        }
+
+        .printer-mac-highlight .mac-code {
+            font-family: 'Courier New', monospace;
+            font-size: 18px;
+            font-weight: 700;
+            color: #0f172a;
+            letter-spacing: 2px;
+            background: white;
+            padding: 4px 12px;
+            border-radius: 8px;
+            display: inline-block;
+        }
+
+        .printer-mac-highlight .label {
+            font-size: 12px;
+            color: #64748b;
+        }
+
+        .btn-delete-printer {
+            background: none;
+            border: none;
+            color: #dc2626;
+            cursor: pointer;
+            font-size: 16px;
+            padding: 4px 8px;
+            border-radius: 8px;
+            transition: 0.2s;
+        }
+
+        .btn-delete-printer:hover {
+            background: #fee2e2;
+        }
+
+        .printer-actions {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container" id="app">
+
+        <!-- TELA INICIAL -->
+        <div class="screen active" id="screen-main">
+            <div class="top-bar" style="justify-content:flex-end; margin-bottom:0;">
+                <div class="printer-status">
+                    <span class="status-dot on" id="printerDot"></span>
+                    <span id="printerStatusText">Conectada</span>
+                </div>
+            </div>
+
+            <div class="main-header">
+                <h1>🏢 Estacionamento Jurupis</h1>
+                <div class="subtitle">Sistema de Gerenciamento</div>
+            </div>
+
+            <div class="main-buttons">
+                <button class="btn btn-success" onclick="showScreen('entry')">
+                    <i class="fas fa-sign-in-alt"></i> ENTRADA
+                </button>
+                <button class="btn btn-danger" onclick="showScreen('exit')">
+                    <i class="fas fa-sign-out-alt"></i> SAÍDA
+                </button>
+                <button class="btn btn-saloon" onclick="showScreen('salao')">
+                    <i class="fas fa-store"></i> SALÃO
+                    <span class="stamp">✦ SALÃO ✦</span>
+                </button>
+            </div>
+
+            <div class="main-footer-grid">
+                <button class="btn" onclick="showScreen('history')">
+                    <i class="fas fa-history"></i> Histórico
+                </button>
+                <button class="btn" onclick="showScreen('cash')">
+                    <i class="fas fa-cash-register"></i> Caixa
+                </button>
+                <button class="btn" onclick="showScreen('settings')">
+                    <i class="fas fa-cog"></i> Gestão
+                </button>
+                <button class="btn btn-warning" onclick="showDailyClosure()">
+                    <i class="fas fa-calendar-day"></i> Fechar Dia
+                </button>
+                <button class="btn btn-warning" onclick="showMonthlyClosure()">
+                    <i class="fas fa-calendar-alt"></i> Fechar Mês
+                </button>
+                <button class="btn btn-primary" onclick="printReport()">
+                    <i class="fas fa-print"></i> Relatório
+                </button>
+            </div>
+
+            <div class="status-bar">
+                <div class="stat-item"><i class="fas fa-car"></i> <strong id="activeCount">0</strong> ativos</div>
+                <div class="stat-item"><i class="fas fa-coins"></i> <strong id="todayTotal">R$ 0,00</strong></div>
+                <div class="stat-item"><i class="fas fa-database"></i> <span id="totalRegistros">0</span></div>
+            </div>
+        </div>
+
+        <!-- TELA SALÃO -->
+        <div class="salao-screen" id="screen-salao">
+            <div class="top-bar">
+                <button class="back-btn" onclick="showScreen('main')"><i class="fas fa-arrow-left"></i></button>
+                <h2>Salão <span class="salao-badge">✦ EXCLUSIVO ✦</span></h2>
+                <div style="width:40px;"></div>
+            </div>
+
+            <div class="salao-header">
+                <h2><i class="fas fa-store"></i> Espaço Salão</h2>
+                <div class="stamp-badge">✦ SALÃO AUTENTICADO ✦</div>
+                <div style="font-size:12px; margin-top:4px; opacity:0.9;">Ticket com selo de autenticidade</div>
+            </div>
+
+            <div class="card">
+                <label>Placa do Veículo</label>
+                <input type="text" id="salaoPlate" placeholder="Ex: ABC1D23" style="text-transform:uppercase;">
+
+                <label>Nome do Cliente <span style="color:#94a3b8;font-weight:400;">(opcional)</span></label>
+                <input type="text" id="salaoName" placeholder="Nome do cliente">
+
+                <label>Telefone <span style="color:#94a3b8;font-weight:400;">(opcional)</span></label>
+                <input type="text" id="salaoPhone" placeholder="(00) 00000-0000">
+
+                <label>Observações</label>
+                <textarea id="salaoObs" placeholder="Observações adicionais..."></textarea>
+
+                <label style="margin-top:16px;">📸 Foto do Veículo (traseira)</label>
+                <div style="display:flex; gap:8px; flex-wrap:wrap; margin:6px 0;">
+                    <button class="camera-btn-salao" onclick="abrirCamera('salao')">
+                        <i class="fas fa-camera"></i> Tirar Foto
+                        <span style="font-size:10px; background:#f59e0b; color:#0f172a; padding:2px 8px; border-radius:30px; font-weight:700; border:1.5px solid #0f172a;">✦ SALÃO ✦</span>
+                    </button>
+                    <input type="file" id="camera-input-salao" accept="image/*" capture="environment" onchange="handlePhotoSalao(event)">
+                    <div class="photo-list-salao" id="photoListSalao"></div>
+                </div>
+
+                <button class="btn btn-saloon" style="margin-top:16px;" onclick="registerSalao()">
+                    <i class="fas fa-store"></i> Registrar Entrada no Salão
+                    <span class="stamp" style="position:relative;top:0;right:0;transform:none;font-size:10px;padding:2px 10px;">✦ SALÃO ✦</span>
+                </button>
+            </div>
+
+            <div id="salaoTicketArea" style="display:none;">
+                <div class="card" style="border:3px solid #8b5cf6;">
+                    <div style="display:flex; justify-content:space-between; align-items:center;">
+                        <h3 style="font-size:20px; color:#7c3aed;">Ticket Salão #<span id="salaoTicketNumberDisplay">0000</span></h3>
+                        <span class="badge badge-salao-tag">✦ SALÃO ✦</span>
+                    </div>
+                    <div class="ticket-salao-preview" id="salaoTicketPreview"></div>
+                    <div class="qr-container" id="salaoQRContainer"></div>
+                    <div class="grid-2">
+                        <button class="btn btn-saloon btn-sm" onclick="printTicket('salao')">
+                            <i class="fas fa-print"></i> Imprimir
+                            <span class="stamp" style="position:relative;top:0;right:0;transform:none;font-size:8px;padding:2px 8px;">✦ SALÃO ✦</span>
+                        </button>
+                        <button class="btn btn-success btn-sm" onclick="showScreen('main')">
+                            <i class="fas fa-check"></i> Finalizar
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- TELA ENTRADA -->
+        <div class="screen" id="screen-entry">
+            <div class="top-bar">
+                <button class="back-btn" onclick="showScreen('main')"><i class="fas fa-arrow-left"></i></button>
+                <h2>Nova Entrada</h2>
+                <div style="width:40px;"></div>
+            </div>
+
+            <div class="card">
+                <label>Placa do Veículo</label>
+                <input type="text" id="entryPlate" placeholder="Ex: ABC1D23" style="text-transform:uppercase;">
+
+                <label>Nome do Cliente <span style="color:#94a3b8;font-weight:400;">(opcional)</span></label>
+                <input type="text" id="entryName" placeholder="Nome do cliente">
+
+                <label>Telefone <span style="color:#94a3b8;font-weight:400;">(opcional)</span></label>
+                <input type="text" id="entryPhone" placeholder="(00) 00000-0000">
+
+                <label>Observações</label>
+                <textarea id="entryObs" placeholder="Observações adicionais..."></textarea>
+
+                <label style="margin-top:16px;">📸 Foto do Veículo (traseira)</label>
+                <div style="display:flex; gap:8px; flex-wrap:wrap; margin:6px 0;">
+                    <button class="camera-btn" onclick="abrirCamera('entrada')">
+                        <i class="fas fa-camera"></i> Tirar Foto
+                    </button>
+                    <input type="file" id="camera-input" accept="image/*" capture="environment" onchange="handlePhoto(event)">
+                    <div class="photo-list" id="photoList"></div>
+                </div>
+
+                <button class="btn btn-success" style="margin-top:16px;" onclick="registerEntry()">
+                    <i class="fas fa-save"></i> Registrar Entrada
+                </button>
+            </div>
+
+            <div id="entryTicketArea" style="display:none;">
+                <div class="card" style="border:2px solid #16a34a;">
+                    <div style="display:flex; justify-content:space-between; align-items:center;">
+                        <h3 style="font-size:20px;">Ticket #<span id="ticketNumberDisplay">0000</span></h3>
+                        <span class="badge badge-success">ATIVO</span>
+                    </div>
+                    <div class="ticket-preview" id="ticketPreview"></div>
+                    <div class="qr-container" id="qrcodeContainer"></div>
+                    <div class="grid-2">
+                        <button class="btn btn-primary btn-sm" onclick="printTicket('entry')">
+                            <i class="fas fa-print"></i> Imprimir
+                        </button>
+                        <button class="btn btn-success btn-sm" onclick="showScreen('main')">
+                            <i class="fas fa-check"></i> Finalizar
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- TELA SAÍDA -->
+        <div class="screen" id="screen-exit">
+            <div class="top-bar">
+                <button class="back-btn" onclick="showScreen('main')"><i class="fas fa-arrow-left"></i></button>
+                <h2>Saída</h2>
+                <div style="width:40px;"></div>
+            </div>
+
+            <div class="tabs">
+                <button class="tab active" data-tab="qr" onclick="switchExitTab('qr')"><i class="fas fa-qrcode"></i> QR</button>
+                <button class="tab" data-tab="ticket" onclick="switchExitTab('ticket')"><i class="fas fa-hashtag"></i> Ticket</button>
+                <button class="tab" data-tab="plate" onclick="switchExitTab('plate')"><i class="fas fa-car"></i> Placa</button>
+            </div>
+
+            <div id="exitTab-qr" class="exit-tab">
+                <div class="card">
+                    <p style="margin-bottom:12px; color:#475569;">Leia o QR Code do ticket para localizar o veículo.</p>
+                    <button class="btn btn-primary" onclick="simulateQRScan()">
+                        <i class="fas fa-camera"></i> Ler QR Code
+                    </button>
+                    <div style="margin-top:8px; font-size:12px; color:#94a3b8;">(Simulação - câmera seria aberta)</div>
+                </div>
+            </div>
+
+            <div id="exitTab-ticket" class="exit-tab" style="display:none;">
+                <div class="card">
+                    <label>Número do Ticket (4 dígitos)</label>
+                    <input type="number" id="exitTicketNumber" placeholder="Ex: 4827" maxlength="4" inputmode="numeric">
+                    <button class="btn btn-primary" style="margin-top:12px;" onclick="searchByTicket()">
+                        <i class="fas fa-search"></i> Buscar
+                    </button>
+                </div>
+            </div>
+
+            <div id="exitTab-plate" class="exit-tab" style="display:none;">
+                <div class="card">
+                    <label>Placa do Veículo</label>
+                    <input type="text" id="exitPlate" placeholder="Ex: ABC1D23" style="text-transform:uppercase;">
+                    <button class="btn btn-primary" style="margin-top:12px;" onclick="searchByPlate()">
+                        <i class="fas fa-search"></i> Buscar
+                    </button>
+                </div>
+            </div>
+
+            <div id="exitResult" style="display:none;">
+                <div class="card" style="border:2px solid #2563eb;">
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+                        <span style="font-weight:700; font-size:18px;">Ticket #<span id="exitTicketNum"></span></span>
+                        <span class="badge" style="background:#2563eb;">ENCONTRADO</span>
+                    </div>
+                    <div style="display:grid; grid-template-columns:1fr 1fr; gap:4px; font-size:14px; margin-bottom:8px;">
+                        <span><strong>Placa:</strong> <span id="exitPlateResult"></span></span>
+                        <span><strong>Entrada:</strong> <span id="exitEntryTime"></span></span>
+                        <span><strong>Tempo:</strong> <span id="exitDuration"></span></span>
+                    </div>
+
+                    <div id="exitPhotos" style="margin-top:8px;"></div>
+
+                    <div style="margin-top:12px; padding-top:12px; border-top:1px solid #e2e8f0;">
+                        <div style="display:flex; justify-content:space-between; font-size:16px;">
+                            <span><strong>Estacionamento:</strong></span>
+                            <span>R$ <span id="exitParkingValue">0,00</span></span>
+                        </div>
+                        <div id="exitServicesContainer" style="margin-top:8px;">
+                            <label style="font-size:13px; margin-top:0;">Serviços adicionais:</label>
+                            <div id="exitServicesList"></div>
+                        </div>
+                        <div style="display:flex; justify-content:space-between; font-size:20px; font-weight:700; margin-top:12px; padding-top:12px; border-top:2px solid #2563eb;">
+                            <span>TOTAL:</span>
+                            <span style="color:#16a34a;">R$ <span id="exitTotalValue">0,00</span></span>
+                        </div>
+                    </div>
+
+                    <div style="margin-top:12px;">
+                        <label>Forma de Pagamento</label>
+                        <select id="exitPaymentMethod" style="margin-top:4px;">
+                            <option value="PIX">PIX</option>
+                            <option value="DINHEIRO">Dinheiro</option>
+                            <option value="CREDITO">Crédito</option>
+                            <option value="DEBITO">Débito</option>
+                        </select>
+                    </div>
+
+                    <button class="btn btn-success" style="margin-top:12px;" onclick="confirmExit()">
+                        <i class="fas fa-check-circle"></i> Confirmar Pagamento e Dar Saída
+                    </button>
+                </div>
+
+                <div id="exitReceipt" style="display:none;">
+                    <div class="card" style="border:2px solid #16a34a;">
+                        <h4 style="display:flex; align-items:center; gap:8px; color:#16a34a;">
+                            <i class="fas fa-check-circle"></i> Saída Confirmada
+                        </h4>
+                        <div class="ticket-preview" id="exitReceiptText"></div>
+                        <div class="grid-2">
+                            <button class="btn btn-primary btn-sm" onclick="printTicket('exit')">
+                                <i class="fas fa-print"></i> Imprimir
+                            </button>
+                            <button class="btn btn-outline btn-sm" onclick="showScreen('main')">
+                                <i class="fas fa-home"></i> Voltar
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- TELA HISTÓRICO -->
+        <div class="screen" id="screen-history">
+            <div class="top-bar">
+                <button class="back-btn" onclick="showScreen('main')"><i class="fas fa-arrow-left"></i></button>
+                <h2>Histórico</h2>
+                <button class="btn btn-sm" style="width:auto; background:#f1f5f9; color:#475569;" onclick="printReport()">
+                    <i class="fas fa-print"></i>
+                </button>
+            </div>
+
+            <div class="filters-row">
+                <button class="btn btn-sm btn-outline" onclick="filterHistory('today')">Hoje</button>
+                <button class="btn btn-sm btn-outline" onclick="filterHistory('week')">7 dias</button>
+                <button class="btn btn-sm btn-outline" onclick="filterHistory('month')">Mês</button>
+                <button class="btn btn-sm btn-outline" onclick="filterHistory('all')">Todos</button>
+            </div>
+
+            <div style="display:flex; gap:6px; margin-bottom:12px;">
+                <input type="text" id="historySearch" placeholder="Buscar ticket ou placa..." style="flex:1;">
+                <button class="btn btn-sm" style="width:auto; background:#2563eb; color:white;" onclick="searchHistory()">
+                    <i class="fas fa-search"></i>
+                </button>
+            </div>
+
+            <div class="scroll-content" id="historyList"></div>
+
+            <div style="margin-top:12px; padding:12px; background:#f1f5f9; border-radius:12px; display:flex; justify-content:space-between; font-size:14px;">
+                <span>Total registros: <strong id="historyTotalCount">0</strong></span>
+                <span>Total: <strong id="historyTotalValue">R$ 0,00</strong></span>
+            </div>
+        </div>
+
+        <!-- TELA CAIXA -->
+        <div class="screen" id="screen-cash">
+            <div class="top-bar">
+                <button class="back-btn" onclick="showScreen('main')"><i class="fas fa-arrow-left"></i></button>
+                <h2>Caixa</h2>
+                <button class="btn btn-sm" style="width:auto; background:#f1f5f9; color:#475569;" onclick="printCashReport()">
+                    <i class="fas fa-print"></i>
+                </button>
+            </div>
+
+            <div class="cash-grid" style="margin-bottom:16px;">
+                <div class="cash-item"><div class="label">Total</div><div class="amount" id="cashTotal">R$ 0,00</div></div>
+                <div class="cash-item"><div class="label">Dinheiro</div><div class="amount" id="cashCash">R$ 0,00</div></div>
+                <div class="cash-item"><div class="label">PIX</div><div class="amount" id="cashPix">R$ 0,00</div></div>
+                <div class="cash-item"><div class="label">Crédito</div><div class="amount" id="cashCredit">R$ 0,00</div></div>
+                <div class="cash-item"><div class="label">Débito</div><div class="amount" id="cashDebit">R$ 0,00</div></div>
+                <div class="cash-item"><div class="label">Veículos</div><div class="amount" id="cashVehicles">0</div></div>
+            </div>
+
+            <div class="grid-2">
+                <button class="btn btn-warning" onclick="showDailyClosure()">
+                    <i class="fas fa-calendar-day"></i> Fechar Dia
+                </button>
+                <button class="btn btn-warning" onclick="showMonthlyClosure()">
+                    <i class="fas fa-calendar-alt"></i> Fechar Mês
+                </button>
+            </div>
+
+            <div id="closureResult" style="margin-top:12px; display:none;">
+                <div class="card" style="border:2px solid #f59e0b;">
+                    <h4 style="margin-bottom:8px;"><i class="fas fa-file-invoice"></i> <span id="closureTitle">Fechamento</span></h4>
+                    <div class="ticket-preview" id="closureText" style="font-family:monospace; font-size:12px;"></div>
+                    <button class="btn btn-primary btn-sm" style="margin-top:12px;" onclick="printClosure()">
+                        <i class="fas fa-print"></i> Imprimir Relatório
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- TELA GESTÃO - IMPRESSORA -->
+        <div class="screen" id="screen-settings">
+            <div class="top-bar">
+                <button class="back-btn" onclick="showScreen('main')"><i class="fas fa-arrow-left"></i></button>
+                <h2>Gestão</h2>
+                <div style="width:40px;"></div>
+            </div>
+
+            <div class="tabs">
+                <button class="tab active" data-tab="set-printer" onclick="switchSettingsTab('printer')">Impressora</button>
+                <button class="tab" data-tab="set-data" onclick="switchSettingsTab('data')">Dados</button>
+                <button class="tab" data-tab="set-values" onclick="switchSettingsTab('values')">Valores</button>
+            </div>
+
+            <!-- Impressora -->
+            <div id="setTab-printer" class="settings-tab">
+                <div class="card">
+                    <div style="display:flex; align-items:center; gap:10px;">
+                        <span class="status-dot on" id="setPrinterDot"></span>
+                        <span id="setPrinterStatus">Conectada</span>
+                        <span style="font-size:12px; color:#94a3b8;" id="printerMacDisplay">(MAC: 86:67:7A:C8:66:DC)</span>
+                    </div>
+
+                    <!-- MAC da sua impressora em destaque -->
+                    <div class="printer-mac-highlight">
+                        <div class="label">📋 Sua impressora cadastrada</div>
+                        <div class="mac-code">86:67:7A:C8:66:DC</div>
+                        <div style="font-size:11px; color:#64748b; margin-top:4px;">Clique em "Conectar" para ativar</div>
+                    </div>
+
+                    <!-- Informação sobre como conectar -->
+                    <div class="bluetooth-info-box">
+                        <i class="fas fa-bluetooth-b"></i>
+                        <h4>Como conectar sua impressora</h4>
+                        <p>1. Clique em <strong>"Abrir Bluetooth"</strong> e conecte a impressora</p>
+                        <p>2. Volte aqui e clique em <strong>"Conectar"</strong> na lista</p>
+                        <button class="btn" onclick="openBluetoothSettings()" style="margin-top:8px;">
+                            <i class="fas fa-cog"></i> Abrir Bluetooth do Celular
+                        </button>
+                    </div>
+
+                    <!-- Botões de ação -->
+                    <div style="display:flex; gap:8px; margin:12px 0; flex-wrap:wrap;">
+                        <button class="btn-bluetooth btn-bluetooth-success" onclick="connectToPrinter()" style="flex:1;">
+                            <i class="fas fa-link"></i> Conectar Padrão
+                        </button>
+                        <button class="btn-bluetooth" onclick="showAddPrinterForm()" style="flex:1;">
+                            <i class="fas fa-plus"></i> Adicionar Outra
+                        </button>
+                        <button class="btn-bluetooth btn-bluetooth-danger" onclick="disconnectPrinter()" style="flex:1;">
+                            <i class="fas fa-times"></i> Desconectar
+                        </button>
+                    </div>
+
+                    <!-- Formulário para adicionar impressora manualmente -->
+                    <div class="add-printer-form" id="addPrinterForm">
+                        <div class="form-row">
+                            <input type="text" id="printerNameInput" placeholder="Nome da impressora" value="Impressora Térmica">
+                            <input type="text" id="printerMacInput" placeholder="MAC (ex: 00:11:22:33:44:55)" value="">
+                        </div>
+                        <div class="form-row">
+                            <button class="btn btn-success" onclick="addPrinterManually()" style="flex:1;">
+                                <i class="fas fa-save"></i> Salvar
+                            </button>
+                            <button class="btn btn-outline" onclick="hideAddPrinterForm()" style="flex:1;">
+                                Cancelar
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Lista de impressoras -->
+                    <div id="bluetoothDevices" class="bluetooth-list">
+                        <!-- Impressoras serão listadas aqui -->
+                    </div>
+
+                    <div style="display:flex; gap:8px; margin-top:8px; flex-wrap:wrap;">
+                        <button class="btn btn-sm btn-success" onclick="saveDefaultPrinter()" style="flex:1;">
+                            <i class="fas fa-save"></i> Salvar Padrão
+                        </button>
+                        <button class="btn btn-sm btn-outline" onclick="testPrint()" style="flex:1;">
+                            <i class="fas fa-print"></i> Testar Impressão
+                        </button>
+                    </div>
+
+                    <div style="margin-top:8px; font-size:12px; color:#94a3b8; text-align:center;">
+                        <i class="fas fa-info-circle"></i> Sua impressora já está cadastrada com o MAC: 86:67:7A:C8:66:DC
+                    </div>
+                </div>
+
+                <!-- Modelo de Ticket 58mm -->
+                <div class="card">
+                    <h4 style="margin-bottom:12px; display:flex; align-items:center; gap:8px;">
+                        <i class="fas fa-receipt"></i> Modelo de Ticket 58mm
+                    </h4>
+                    <div class="ticket-sample">
+                        <div class="header">
+                            ESTACIONAMENTO JURUPIS
+                            <div class="sub">CNPJ: 00.000.000/0001-00</div>
+                            <div class="sub">Rua Exemplo, 123 - Tel: (11) 99999-9999</div>
+                        </div>
+                        <div class="divider"></div>
+                        <div class="row"><span class="label">TICKET:</span><span class="value">4827</span></div>
+                        <div class="plate">ABC-1D23</div>
+                        <div class="row"><span class="label">DATA:</span><span class="value">14/08/2026</span></div>
+                        <div class="row"><span class="label">ENTRADA:</span><span class="value">10:30</span></div>
+                        <div class="divider"></div>
+                        <div class="car-example-photo">
+                            <i class="fas fa-car"></i> 🚗 TRASEIRA
+                        </div>
+                        <div class="divider"></div>
+                        <div class="qr" id="sampleQR"></div>
+                        <div style="text-align:center; font-size:8px; color:#94a3b8;">QR Code para localização</div>
+                        <div class="divider"></div>
+                        <div class="footer">Obrigado pela preferência!</div>
+                    </div>
+                    <div style="margin-top:8px; text-align:center; font-size:11px; color:#94a3b8;">
+                        <i class="fas fa-info-circle"></i> Modelo de impressão em papel 58mm
+                    </div>
+                </div>
+
+                <!-- Modelo Ticket Salão -->
+                <div class="card" style="border:2px solid #8b5cf6;">
+                    <h4 style="margin-bottom:12px; display:flex; align-items:center; gap:8px; color:#7c3aed;">
+                        <i class="fas fa-store"></i> Modelo Ticket Salão
+                    </h4>
+                    <div class="ticket-sample" style="border-color:#8b5cf6; position:relative;">
+                        <div style="position:absolute;top:4px;right:4px;background:#f59e0b;color:#0f172a;font-size:7px;font-weight:800;padding:2px 8px;border-radius:30px;transform:rotate(15deg);border:1.5px solid #0f172a;letter-spacing:0.5px;">✦ SALÃO ✦</div>
+                        <div class="header" style="border-color:#8b5cf6;">
+                            🏪 SALÃO JURUPIS
+                            <div class="sub">Espaço exclusivo</div>
+                            <div class="sub" style="font-size:8px;color:#8b5cf6;font-weight:700;">✦ AUTENTICADO ✦</div>
+                        </div>
+                        <div class="divider"></div>
+                        <div class="row"><span class="label">TICKET:</span><span class="value">S-4827</span></div>
+                        <div class="plate" style="background:#7c3aed;">ABC-1D23</div>
+                        <div class="row"><span class="label">DATA:</span><span class="value">14/08/2026</span></div>
+                        <div class="row"><span class="label">ENTRADA:</span><span class="value">10:30</span></div>
+                        <div class="divider"></div>
+                        <div style="text-align:center;font-size:9px;color:#8b5cf6;font-weight:600;">✦ SELO DE AUTENTICIDADE ✦</div>
+                        <div class="qr" id="sampleSalaoQR"></div>
+                        <div style="text-align:center; font-size:8px; color:#94a3b8;">QR Code Salão</div>
+                        <div class="divider"></div>
+                        <div class="footer" style="border-color:#8b5cf6;color:#7c3aed;">Obrigado pela preferência!</div>
+                    </div>
+                    <div style="margin-top:8px; text-align:center; font-size:11px; color:#94a3b8;">
+                        <i class="fas fa-stamp"></i> Ticket com selo de autenticidade do Salão
+                    </div>
+                </div>
+            </div>
+
+            <!-- Dados Estacionamento -->
+            <div id="setTab-data" class="settings-tab" style="display:none;">
+                <div class="card">
+                    <label>Nome do Estacionamento</label>
+                    <input type="text" id="setName" value="Estacionamento Jurupis">
+                    <label>CNPJ</label>
+                    <input type="text" id="setCnpj" value="00.000.000/0001-00">
+                    <label>Endereço</label>
+                    <input type="text" id="setAddress" value="Rua Exemplo, 123">
+                    <label>Telefone 1</label>
+                    <input type="text" id="setPhone1" value="(11) 99999-9999">
+                    <label>Telefone 2</label>
+                    <input type="text" id="setPhone2" value="(11) 88888-8888">
+                    <button class="btn btn-primary" style="margin-top:12px;" onclick="saveConfig()">
+                        <i class="fas fa-save"></i> Salvar
+                    </button>
+                </div>
+            </div>
+
+            <!-- Valores -->
+            <div id="setTab-values" class="settings-tab" style="display:none;">
+                <div class="card">
+                    <h4>Tarifas Estacionamento</h4>
+                    <label>1 hora (R$)</label>
+                    <input type="number" id="rate1h" value="25.00" step="0.01">
+                    <label>Hora adicional (R$)</label>
+                    <input type="number" id="rateAdd" value="10.00" step="0.01">
+                    <label>Período 12 horas (R$)</label>
+                    <input type="number" id="rate12h" value="40.00" step="0.01">
+                    <button class="btn btn-primary btn-sm" style="margin-top:8px;" onclick="saveRates()">
+                        <i class="fas fa-save"></i> Salvar Tarifas
+                    </button>
+                </div>
+
+                <div class="card">
+                    <h4>Serviços Adicionais</h4>
+                    <div id="servicesList">
+                        <div style="display:flex; gap:6px; align-items:center; margin-bottom:6px;">
+                            <input type="text" placeholder="Nome" value="Lavagem simples" style="flex:2;">
+                            <input type="number" placeholder="R$" value="30.00" step="0.01" style="flex:1;">
+                            <button class="btn btn-xs" style="width:auto; background:#e2e8f0; color:#475569;" onclick="removeService(this)"><i class="fas fa-trash"></i></button>
+                        </div>
+                        <div style="display:flex; gap:6px; align-items:center; margin-bottom:6px;">
+                            <input type="text" placeholder="Nome" value="Lavagem completa" style="flex:2;">
+                            <input type="number" placeholder="R$" value="50.00" step="0.01" style="flex:1;">
+                            <button class="btn btn-xs" style="width:auto; background:#e2e8f0; color:#475569;" onclick="removeService(this)"><i class="fas fa-trash"></i></button>
+                        </div>
+                        <div style="display:flex; gap:6px; align-items:center; margin-bottom:6px;">
+                            <input type="text" placeholder="Nome" value="Polimento" style="flex:2;">
+                            <input type="number" placeholder="R$" value="80.00" step="0.01" style="flex:1;">
+                            <button class="btn btn-xs" style="width:auto; background:#e2e8f0; color:#475569;" onclick="removeService(this)"><i class="fas fa-trash"></i></button>
+                        </div>
+                    </div>
+                    <button class="btn btn-sm btn-outline" onclick="addServiceField()">
+                        <i class="fas fa-plus"></i> Adicionar Serviço
+                    </button>
+                    <button class="btn btn-primary btn-sm" style="margin-top:8px;" onclick="saveServices()">
+                        <i class="fas fa-save"></i> Salvar Serviços
+                    </button>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        // ============================================================
+        // SISTEMA COMPLETO - PARKING MANAGER PRO
+        // ============================================================
+
+        // --- MAC DA IMPRESSORA PADRÃO ---
+        const PRINTER_MAC = '86:67:7A:C8:66:DC';
+        const PRINTER_NAME = 'Impressora Térmica 58mm';
+
+        // --- BANCO DE DADOS LOCAL (localStorage) ---
+        const DB = {
+            get(key) {
+                try {
+                    return JSON.parse(localStorage.getItem('parking_' + key)) || null;
+                } catch { return null; }
+            },
+            set(key, data) {
+                localStorage.setItem('parking_' + key, JSON.stringify(data));
+            },
+            remove(key) {
+                localStorage.removeItem('parking_' + key);
+            }
+        };
+
+        // --- DADOS INICIAIS ---
+        function getDefaultData() {
+            return {
+                tickets: [],
+                payments: [],
+                services: [
+                    { id: 1, name: 'Lavagem simples', value: 30.00 },
+                    { id: 2, name: 'Lavagem completa', value: 50.00 },
+                    { id: 3, name: 'Polimento', value: 80.00 }
+                ],
+                rates: { '1h': 25.00, 'add': 10.00, '12h': 40.00 },
+                config: {
+                    name: 'Estacionamento Jurupis',
+                    cnpj: '00.000.000/0001-00',
+                    address: 'Rua Exemplo, 123',
+                    phone1: '(11) 99999-9999',
+                    phone2: '(11) 88888-8888'
+                },
+                closures: [],
+                printers: [
+                    { id: 1, name: PRINTER_NAME, mac: PRINTER_MAC, connected: false }
+                ]
+            };
+        }
+
+        // --- ESTADO GLOBAL ---
+        let state = DB.get('state') || getDefaultData();
+        let currentTicket = null;
+        let currentExitTicket = null;
+        let currentSalaoTicket = null;
+        let capturedPhotos = [];
+        let capturedPhotosSalao = [];
+        let currentHistoryFilter = 'today';
+        let printerConnected = false;
+        let printerName = PRINTER_NAME;
+        let printerMac = PRINTER_MAC;
+
+        // --- PERSISTÊNCIA ---
+        function saveState() {
+            DB.set('state', state);
+        }
+
+        // --- TOAST ---
+        function showToast(message, type = 'success') {
+            const existing = document.querySelector('.toast');
+            if (existing) existing.remove();
+
+            const toast = document.createElement('div');
+            toast.className = `toast toast-${type}`;
+            toast.textContent = message;
+            document.body.appendChild(toast);
+
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                toast.style.transition = 'opacity 0.3s';
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
+
+        // --- INICIALIZAÇÃO ---
+        function init() {
+            if (!state.tickets) state.tickets = [];
+            if (!state.payments) state.payments = [];
+            if (!state.services || state.services.length === 0) {
+                state.services = [
+                    { id: 1, name: 'Lavagem simples', value: 30.00 },
+                    { id: 2, name: 'Lavagem completa', value: 50.00 },
+                    { id: 3, name: 'Polimento', value: 80.00 }
+                ];
+            }
+            if (!state.rates) state.rates = { '1h': 25.00, 'add': 10.00, '12h': 40.00 };
+            if (!state.config) {
+                state.config = {
+                    name: 'Estacionamento Jurupis',
+                    cnpj: '00.000.000/0001-00',
+                    address: 'Rua Exemplo, 123',
+                    phone1: '(11) 99999-9999',
+                    phone2: '(11) 88888-8888'
+                };
+            }
+            if (!state.closures) state.closures = [];
+            if (!state.printers || state.printers.length === 0) {
+                state.printers = [
+                    { id: 1, name: PRINTER_NAME, mac: PRINTER_MAC, connected: false }
+                ];
+            }
+
+            document.querySelector('.main-header h1').textContent = state.config.name || 'Estacionamento Jurupis';
+
+            saveState();
+            updateUI();
+            renderPhotoList();
+            renderPhotoListSalao();
+            renderHistory();
+
+            document.getElementById('setName').value = state.config.name || '';
+            document.getElementById('setCnpj').value = state.config.cnpj || '';
+            document.getElementById('setAddress').value = state.config.address || '';
+            document.getElementById('setPhone1').value = state.config.phone1 || '';
+            document.getElementById('setPhone2').value = state.config.phone2 || '';
+            document.getElementById('rate1h').value = state.rates['1h'] || 25.00;
+            document.getElementById('rateAdd').value = state.rates['add'] || 10.00;
+            document.getElementById('rate12h').value = state.rates['12h'] || 40.00;
+
+            renderServicesUI();
+            generateSampleQR();
+            generateSampleSalaoQR();
+
+            // Carregar impressora padrão
+            const savedPrinter = localStorage.getItem('parking_printer');
+            if (savedPrinter) {
+                try {
+                    const data = JSON.parse(savedPrinter);
+                    printerName = data.name;
+                    printerMac = data.mac;
+                    printerConnected = true;
+                    updatePrinterStatus();
+                    showToast(`🖨️ Impressora padrão: ${printerName}`, 'success');
+                } catch (e) {
+                    printerName = savedPrinter;
+                    printerConnected = true;
+                    updatePrinterStatus();
+                }
+            }
+
+            // Garantir que a impressora padrão esteja na lista
+            const exists = state.printers.find(p => p.mac === PRINTER_MAC);
+            if (!exists) {
+                state.printers.push({ id: Date.now(), name: PRINTER_NAME, mac: PRINTER_MAC, connected: false });
+                saveState();
+            }
+
+            renderPrintersList();
+            showToast('Sistema inicializado com sucesso!', 'success');
+        }
+
+        // --- GERAR QR CODE ---
+        function generateSampleQR() {
+            const container = document.getElementById('sampleQR');
+            container.innerHTML = '';
+            try {
+                new QRCode(container, {
+                    text: 'ticket_4827_123456789',
+                    width: 60,
+                    height: 60,
+                    colorDark: "#000000",
+                    colorLight: "#ffffff",
+                    correctLevel: QRCode.CorrectLevel.H
+                });
+            } catch (e) {
+                container.innerHTML = '<div style="padding:10px;color:#94a3b8;">QR</div>';
+            }
+        }
+
+        function generateSampleSalaoQR() {
+            const container = document.getElementById('sampleSalaoQR');
+            container.innerHTML = '';
+            try {
+                new QRCode(container, {
+                    text: 'salao_S-4827_123456789',
+                    width: 60,
+                    height: 60,
+                    colorDark: "#7c3aed",
+                    colorLight: "#ffffff",
+                    correctLevel: QRCode.CorrectLevel.H
+                });
+            } catch (e) {
+                container.innerHTML = '<div style="padding:10px;color:#94a3b8;">QR</div>';
+            }
+        }
+
+        // --- RENDER SERVICES UI ---
+        function renderServicesUI() {
+            const container = document.getElementById('servicesList');
+            container.innerHTML = '';
+            state.services.forEach(s => {
+                const div = document.createElement('div');
+                div.style.display = 'flex';
+                div.style.gap = '6px';
+                div.style.alignItems = 'center';
+                div.style.marginBottom = '6px';
+                div.innerHTML = `
+                    <input type="text" placeholder="Nome" value="${s.name}" style="flex:2;">
+                    <input type="number" placeholder="R$" value="${s.value}" step="0.01" style="flex:1;">
+                    <button class="btn btn-xs" style="width:auto; background:#e2e8f0; color:#475569;" onclick="removeService(this)"><i class="fas fa-trash"></i></button>
+                `;
+                container.appendChild(div);
+            });
+        }
+
+        // --- UPDATE UI ---
+        function updateUI() {
+            const active = state.tickets.filter(t => t.status === 'ACTIVE');
+            document.getElementById('activeCount').textContent = active.length;
+
+            const today = new Date().toISOString().split('T')[0];
+            const todayPayments = state.payments.filter(p => p.dateTime && p.dateTime.startsWith(today));
+            const total = todayPayments.reduce((acc, p) => acc + p.amount, 0);
+            document.getElementById('todayTotal').textContent = `R$ ${total.toFixed(2)}`;
+
+            const allPayments = state.payments;
+            const totalAll = allPayments.reduce((acc, p) => acc + p.amount, 0);
+            document.getElementById('cashTotal').textContent = `R$ ${totalAll.toFixed(2)}`;
+
+            const methods = { DINHEIRO: 0, PIX: 0, CREDITO: 0, DEBITO: 0 };
+            allPayments.forEach(p => {
+                if (methods[p.method] !== undefined) methods[p.method] += p.amount;
+            });
+            document.getElementById('cashCash').textContent = `R$ ${methods.DINHEIRO.toFixed(2)}`;
+            document.getElementById('cashPix').textContent = `R$ ${methods.PIX.toFixed(2)}`;
+            document.getElementById('cashCredit').textContent = `R$ ${methods.CREDITO.toFixed(2)}`;
+            document.getElementById('cashDebit').textContent = `R$ ${methods.DEBITO.toFixed(2)}`;
+            document.getElementById('cashVehicles').textContent = active.length;
+
+            document.getElementById('totalRegistros').textContent = state.tickets.length;
+
+            if (document.getElementById('screen-history').classList.contains('active')) {
+                renderHistory();
+            }
+        }
+
+        // --- UPDATE PRINTER STATUS ---
+        function updatePrinterStatus() {
+            const statusText = printerConnected ? 'Conectada' : 'Desconectada';
+            const dotClass = printerConnected ? 'on' : 'off';
+
+            document.getElementById('printerStatusText').textContent = statusText;
+            document.getElementById('printerDot').className = `status-dot ${dotClass}`;
+            document.getElementById('setPrinterStatus').textContent = statusText;
+            document.getElementById('setPrinterDot').className = `status-dot ${dotClass}`;
+
+            if (printerConnected && printerName) {
+                document.getElementById('setPrinterStatus').textContent = `Conectada - ${printerName}`;
+                document.getElementById('printerMacDisplay').textContent = `(MAC: ${printerMac || 'N/A'})`;
+            } else {
+                document.getElementById('setPrinterStatus').textContent = 'Desconectada';
+                document.getElementById('printerMacDisplay').textContent = `(MAC: ${PRINTER_MAC})`;
+            }
+        }
+
+        // --- NAVEGAÇÃO ---
+        function showScreen(screenId) {
+            document.querySelectorAll('.screen, .salao-screen').forEach(el => el.classList.remove('active'));
+            const target = document.getElementById('screen-' + screenId);
+            if (target) target.classList.add('active');
+
+            if (screenId === 'main') {
+                document.querySelector('.main-header h1').textContent = state.config.name || 'Estacionamento Jurupis';
+                updateUI();
+            }
+            if (screenId === 'history') renderHistory();
+            if (screenId === 'exit') {
+                document.getElementById('exitResult').style.display = 'none';
+                document.getElementById('exitReceipt').style.display = 'none';
+            }
+            if (screenId === 'cash') {
+                document.getElementById('closureResult').style.display = 'none';
+                updateUI();
+            }
+            if (screenId === 'salao') {
+                document.getElementById('salaoTicketArea').style.display = 'none';
+            }
+        }
+
+        // ============================================================
+        // CÂMERA
+        // ============================================================
+        function abrirCamera(tipo) {
+            if (tipo === 'entrada') {
+                document.getElementById('camera-input').click();
+            } else if (tipo === 'salao') {
+                document.getElementById('camera-input-salao').click();
+            }
+        }
+
+        function handlePhoto(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                capturedPhotos.push(e.target.result);
+                renderPhotoList();
+                showToast('📸 Foto capturada com sucesso!', 'success');
+                event.target.value = '';
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function handlePhotoSalao(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                capturedPhotosSalao.push(e.target.result);
+                renderPhotoListSalao();
+                showToast('📸 Foto capturada com sucesso!', 'success');
+                event.target.value = '';
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function renderPhotoList() {
+            const container = document.getElementById('photoList');
+            container.innerHTML = '';
+
+            capturedPhotos.forEach((url, index) => {
+                const div = document.createElement('div');
+                div.className = 'photo-thumb';
+                const img = document.createElement('img');
+                img.src = url;
+                img.alt = `Foto ${index + 1}`;
+
+                const removeBtn = document.createElement('div');
+                removeBtn.className = 'remove-photo';
+                removeBtn.innerHTML = '×';
+                removeBtn.onclick = (e) => {
+                    e.stopPropagation();
+                    capturedPhotos.splice(index, 1);
+                    renderPhotoList();
+                };
+
+                div.appendChild(img);
+                div.appendChild(removeBtn);
+                container.appendChild(div);
+            });
+
+            if (capturedPhotos.length === 0) {
+                const placeholder = document.createElement('div');
+                placeholder.className = 'photo-thumb';
+                placeholder.innerHTML = '<div class="camera-placeholder"><i class="fas fa-camera"></i></div>';
+                container.appendChild(placeholder);
+            }
+        }
+
+        function renderPhotoListSalao() {
+            const container = document.getElementById('photoListSalao');
+            container.innerHTML = '';
+
+            capturedPhotosSalao.forEach((url, index) => {
+                const div = document.createElement('div');
+                div.className = 'photo-thumb';
+                const img = document.createElement('img');
+                img.src = url;
+                img.alt = `Foto ${index + 1}`;
+
+                const removeBtn = document.createElement('div');
+                removeBtn.className = 'remove-photo';
+                removeBtn.innerHTML = '×';
+                removeBtn.onclick = (e) => {
+                    e.stopPropagation();
+                    capturedPhotosSalao.splice(index, 1);
+                    renderPhotoListSalao();
+                };
+
+                div.appendChild(img);
+                div.appendChild(removeBtn);
+                container.appendChild(div);
+            });
+
+            if (capturedPhotosSalao.length === 0) {
+                const placeholder = document.createElement('div');
+                placeholder.className = 'photo-thumb';
+                placeholder.innerHTML = '<div class="camera-placeholder"><i class="fas fa-camera"></i></div>';
+                container.appendChild(placeholder);
+            }
+        }
+
+        // ============================================================
+        // BLUETOOTH - IMPRESSORAS
+        // ============================================================
+
+        // --- Abrir configurações de Bluetooth do celular ---
+        function openBluetoothSettings() {
+            try {
+                window.location.href = 'intent://settings/#Intent;action=android.settings.BLUETOOTH_SETTINGS;end';
+            } catch (e) {
+                try {
+                    window.location.href = 'bluetooth://settings';
+                } catch (e2) {
+                    showToast('Abra as configurações de Bluetooth manualmente', 'info');
+                }
+            }
+            setTimeout(() => {
+                showToast('📱 Conecte a impressora manualmente e volte', 'info');
+            }, 500);
+        }
+
+        // --- Mostrar formulário para adicionar impressora ---
+        function showAddPrinterForm() {
+            document.getElementById('addPrinterForm').classList.add('show');
+            document.getElementById('printerMacInput').value = '';
+            document.getElementById('printerNameInput').value = 'Impressora Térmica';
+        }
+
+        function hideAddPrinterForm() {
+            document.getElementById('addPrinterForm').classList.remove('show');
+        }
+
+        // --- Adicionar impressora manualmente ---
+        function addPrinterManually() {
+            const name = document.getElementById('printerNameInput').value.trim();
+            const mac = document.getElementById('printerMacInput').value.trim().toUpperCase();
+
+            if (!name) {
+                showToast('Digite o nome da impressora.', 'error');
+                return;
+            }
+
+            if (!mac || mac.length < 10) {
+                showToast('Digite um endereço MAC válido (ex: 00:11:22:33:44:55)', 'error');
+                return;
+            }
+
+            // Verificar se já existe
+            const exists = state.printers.find(p => p.mac === mac);
+            if (exists) {
+                showToast('Esta impressora já está na lista.', 'info');
+                hideAddPrinterForm();
+                return;
+            }
+
+            // Adicionar à lista
+            const printer = {
+                id: Date.now(),
+                name: name,
+                mac: mac,
+                connected: false
+            };
+
+            state.printers.push(printer);
+            saveState();
+            renderPrintersList();
+            hideAddPrinterForm();
+
+            showToast(`✅ Impressora "${name}" adicionada com sucesso!`, 'success');
+
+            // Perguntar se quer conectar
+            if (confirm(`Deseja conectar à impressora "${name}" agora?`)) {
+                connectSpecificPrinter(printer);
+            }
+        }
+
+        // --- Conectar à impressora padrão ---
+        function connectToPrinter() {
+            const printer = state.printers.find(p => p.mac === PRINTER_MAC);
+            if (!printer) {
+                showToast('Impressora padrão não encontrada.', 'error');
+                return;
+            }
+            connectSpecificPrinter(printer);
+        }
+
+        // --- Conectar a uma impressora específica ---
+        function connectSpecificPrinter(printer) {
+            // Atualizar status para "Conectando..."
+            const items = document.querySelectorAll('.bluetooth-item');
+            items.forEach(item => {
+                const nameSpan = item.querySelector('.device-name');
+                if (nameSpan && nameSpan.textContent.includes(printer.name)) {
+                    const badge = item.querySelector('.status-badge');
+                    badge.textContent = 'Conectando...';
+                    badge.className = 'status-badge connecting';
+                }
+            });
+
+            showToast('🔄 Conectando à impressora...', 'info');
+
+            // Simular conexão
+            setTimeout(() => {
+                printerConnected = true;
+                printerName = printer.name;
+                printerMac = printer.mac;
+
+                state.printers.forEach(p => {
+                    p.connected = (p.id === printer.id);
+                });
+                saveState();
+
+                updatePrinterStatus();
+                renderPrintersList();
+
+                // Salvar automaticamente como padrão
+                saveDefaultPrinter();
+
+                showToast(`✅ Conectado à ${printer.name} com sucesso!`, 'success');
+            }, 2000);
+        }
+
+        // --- Remover impressora ---
+        function removePrinter(id) {
+            const printer = state.printers.find(p => p.id === id);
+            if (!printer) return;
+
+            // Não permitir remover a impressora padrão
+            if (printer.mac === PRINTER_MAC) {
+                showToast('❌ Não é possível remover a impressora padrão.', 'error');
+                return;
+            }
+
+            if (confirm(`Remover a impressora "${printer.name}" da lista?`)) {
+                state.printers = state.printers.filter(p => p.id !== id);
+
+                // Se a impressora removida era a conectada, desconectar
+                if (printerConnected && printer.id === id) {
+                    printerConnected = false;
+                    printerName = PRINTER_NAME;
+                    printerMac = PRINTER_MAC;
+                    localStorage.removeItem('parking_printer');
+                    updatePrinterStatus();
+                }
+
+                saveState();
+                renderPrintersList();
+                showToast('Impressora removida.', 'info');
+            }
+        }
+
+        // --- Renderizar lista de impressoras ---
+        function renderPrintersList() {
+            const container = document.getElementById('bluetoothDevices');
+
+            if (!state.printers || state.printers.length === 0) {
+                container.innerHTML = `
+                    <div class="bluetooth-scanning">
+                        <i class="fas fa-bluetooth-b"></i>
+                        <p style="font-size:14px; font-weight:500;">Nenhuma impressora cadastrada</p>
+                        <p style="font-size:12px; color:#94a3b8;">Clique em "Adicionar Outra" para cadastrar</p>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = '';
+            state.printers.forEach(printer => {
+                const div = document.createElement('div');
+                div.className = 'bluetooth-item';
+
+                const isConnected = printerConnected && printerName === printer.name;
+                const isDefault = printer.mac === PRINTER_MAC;
+
+                const statusClass = isConnected ? 'connected' : 'disconnected';
+                const statusText = isConnected ? 'Conectada' : 'Desconectada';
+
+                const highlightStyle = isDefault ? 'border-color: #8b5cf6; background: #faf5ff;' : '';
+
+                div.innerHTML = `
+                    <div class="device-info">
+                        <div class="device-name">🖨️ ${printer.name} ${isDefault ? '⭐' : ''}</div>
+                        <div class="device-mac">MAC: ${printer.mac}</div>
+                        ${isDefault ? '<div style="font-size:10px; color:#8b5cf6; font-weight:600;">✦ Impressora padrão</div>' : ''}
+                    </div>
+                    <div class="printer-actions">
+                        <span class="status-badge ${statusClass}">${statusText}</span>
+                        ${!isDefault ? `<button class="btn-delete-printer" onclick="event.stopPropagation(); removePrinter(${printer.id})" title="Remover"><i class="fas fa-trash"></i></button>` : ''}
+                    </div>
+                `;
+
+                div.onclick = () => {
+                    if (!isConnected) {
+                        connectSpecificPrinter(printer);
+                    } else {
+                        showToast(`✅ ${printer.name} já está conectada`, 'success');
+                    }
+                };
+
+                container.appendChild(div);
+            });
+        }
+
+        // --- Salvar impressora padrão ---
+        function saveDefaultPrinter() {
+            if (printerConnected && printerName) {
+                const data = {
+                    name: printerName,
+                    mac: printerMac
+                };
+                localStorage.setItem('parking_printer', JSON.stringify(data));
+                showToast('✅ Impressora salva como padrão!', 'success');
+            } else {
+                showToast('⚠️ Conecte uma impressora primeiro.', 'error');
+            }
+        }
+
+        // --- Desconectar impressora ---
+        function disconnectPrinter() {
+            printerConnected = false;
+            printerName = PRINTER_NAME;
+            printerMac = PRINTER_MAC;
+            localStorage.removeItem('parking_printer');
+
+            state.printers.forEach(p => p.connected = false);
+            saveState();
+
+            updatePrinterStatus();
+            renderPrintersList();
+            showToast('Impressora desconectada.', 'error');
+        }
+
+        // ============================================================
+        // ENTRADA
+        // ============================================================
+        function registerEntry() {
+            const plate = document.getElementById('entryPlate').value.trim().toUpperCase();
+
+            if (!plate || plate.length < 6) {
+                showToast('Placa inválida.', 'error');
+                return;
+            }
+
+            let num = Math.floor(1000 + Math.random() * 9000);
+            const activeNumbers = state.tickets.filter(t => t.status === 'ACTIVE').map(t => t.ticketNumber);
+            while (activeNumbers.includes(num)) {
+                num = Math.floor(1000 + Math.random() * 9000);
+            }
+
+            const name = document.getElementById('entryName').value.trim() || undefined;
+            const phone = document.getElementById('entryPhone').value.trim() || undefined;
+            const obs = document.getElementById('entryObs').value.trim() || undefined;
+            const now = new Date().toISOString();
+            const qrData = `ticket_${num}_${Date.now()}`;
+
+            const ticket = {
+                id: Date.now(),
+                ticketNumber: num,
+                licensePlate: plate,
+                customerName: name,
+                customerPhone: phone,
+                entryDateTime: now,
+                exitDateTime: null,
+                status: 'ACTIVE',
+                observations: obs,
+                qrCodeData: qrData,
+                photos: capturedPhotos.slice(),
+                servicesApplied: [],
+                isSalao: false
+            };
+
+            state.tickets.push(ticket);
+            saveState();
+            currentTicket = ticket;
+
+            document.getElementById('entryTicketArea').style.display = 'block';
+            document.getElementById('ticketNumberDisplay').textContent = String(num).padStart(4, '0');
+
+            const entryDate = new Date(now);
+            const preview = `
+        ═════════════════════════════════
+          ${state.config.name || 'Estacionamento Jurupis'}
+          ${state.config.cnpj || ''}
+          ${state.config.address || ''}
+          Tel: ${state.config.phone1 || ''}
+        ═════════════════════════════════
+        
+          TICKET: ${String(num).padStart(4, '0')}
+          PLACA: ${plate}
+          DATA: ${entryDate.toLocaleDateString('pt-BR')}
+          ENTRADA: ${entryDate.toLocaleTimeString('pt-BR', {hour:'2-digit',minute:'2-digit'})}
+        
+        ═════════════════════════════════
+          📸 FOTO DA TRASEIRA
+        ═════════════════════════════════
+        
+          QR Code para localização
+        ═════════════════════════════════
+          Obrigado pela preferência!`;
+
+            document.getElementById('ticketPreview').textContent = preview;
+
+            const container = document.getElementById('qrcodeContainer');
+            container.innerHTML = '';
+            try {
+                new QRCode(container, {
+                    text: qrData,
+                    width: 160,
+                    height: 160,
+                    colorDark: "#000000",
+                    colorLight: "#ffffff",
+                    correctLevel: QRCode.CorrectLevel.H
+                });
+            } catch (e) {
+                container.innerHTML = '<div style="padding:20px;color:#64748b;">QR Code gerado</div>';
+            }
+
+            document.getElementById('entryPlate').value = '';
+            document.getElementById('entryName').value = '';
+            document.getElementById('entryPhone').value = '';
+            document.getElementById('entryObs').value = '';
+            capturedPhotos = [];
+            renderPhotoList();
+
+            updateUI();
+            showToast(`Ticket #${String(num).padStart(4, '0')} registrado com sucesso!`, 'success');
+        }
+
+        // ============================================================
+        // SALÃO - ENTRADA
+        // ============================================================
+        function registerSalao() {
+            const plate = document.getElementById('salaoPlate').value.trim().toUpperCase();
+
+            if (!plate || plate.length < 6) {
+                showToast('Placa inválida.', 'error');
+                return;
+            }
+
+            let num = Math.floor(1000 + Math.random() * 9000);
+            const activeNumbers = state.tickets.filter(t => t.status === 'ACTIVE').map(t => t.ticketNumber);
+            while (activeNumbers.includes(num)) {
+                num = Math.floor(1000 + Math.random() * 9000);
+            }
+
+            const name = document.getElementById('salaoName').value.trim() || undefined;
+            const phone = document.getElementById('salaoPhone').value.trim() || undefined;
+            const obs = document.getElementById('salaoObs').value.trim() || undefined;
+            const now = new Date().toISOString();
+            const qrData = `salao_${num}_${Date.now()}`;
+
+            const photosToSave = capturedPhotosSalao.length > 0 ? capturedPhotosSalao.slice() : [];
+
+            const ticket = {
+                id: Date.now(),
+                ticketNumber: num,
+                licensePlate: plate,
+                customerName: name,
+                customerPhone: phone,
+                entryDateTime: now,
+                exitDateTime: null,
+                status: 'ACTIVE',
+                observations: obs,
+                qrCodeData: qrData,
+                photos: photosToSave,
+                servicesApplied: [],
+                isSalao: true
+            };
+
+            state.tickets.push(ticket);
+            saveState();
+            currentSalaoTicket = ticket;
+
+            document.getElementById('salaoTicketArea').style.display = 'block';
+            document.getElementById('salaoTicketNumberDisplay').textContent = String(num).padStart(4, '0');
+
+            const entryDate = new Date(now);
+            const preview = `
+        ═════════════════════════════════
+          🏪 SALÃO ${state.config.name || 'Estacionamento Jurupis'}
+          ${state.config.cnpj || ''}
+          ${state.config.address || ''}
+          Tel: ${state.config.phone1 || ''}
+        ═════════════════════════════════
+        
+          TICKET: S-${String(num).padStart(4, '0')}
+          PLACA: ${plate}
+          DATA: ${entryDate.toLocaleDateString('pt-BR')}
+          ENTRADA: ${entryDate.toLocaleTimeString('pt-BR', {hour:'2-digit',minute:'2-digit'})}
+        
+        ═════════════════════════════════
+          ✦ SELO DE AUTENTICIDADE ✦
+          SALÃO EXCLUSIVO
+        ═════════════════════════════════
+          📸 FOTO DA TRASEIRA
+        ═════════════════════════════════
+        
+          QR Code para localização
+        ═════════════════════════════════
+          Obrigado pela preferência!`;
+
+            document.getElementById('salaoTicketPreview').textContent = preview;
+
+            const container = document.getElementById('salaoQRContainer');
+            container.innerHTML = '';
+            try {
+                new QRCode(container, {
+                    text: qrData,
+                    width: 160,
+                    height: 160,
+                    colorDark: "#7c3aed",
+                    colorLight: "#ffffff",
+                    correctLevel: QRCode.CorrectLevel.H
+                });
+            } catch (e) {
+                container.innerHTML = '<div style="padding:20px;color:#64748b;">QR Code gerado</div>';
+            }
+
+            document.getElementById('salaoPlate').value = '';
+            document.getElementById('salaoName').value = '';
+            document.getElementById('salaoPhone').value = '';
+            document.getElementById('salaoObs').value = '';
+            capturedPhotosSalao = [];
+            renderPhotoListSalao();
+
+            updateUI();
+            showToast(`Ticket Salão #S-${String(num).padStart(4, '0')} registrado com sucesso! ✦`, 'success');
+        }
+
+        // ============================================================
+        // SAÍDA
+        // ============================================================
+        let exitTab = 'qr';
+
+        function switchExitTab(tab) {
+            exitTab = tab;
+            document.querySelectorAll('#screen-exit .tab').forEach(el => el.classList.remove('active'));
+            document.querySelector(`#screen-exit .tab[data-tab="${tab}"]`).classList.add('active');
+            document.querySelectorAll('.exit-tab').forEach(el => el.style.display = 'none');
+            document.getElementById(`exitTab-${tab}`).style.display = 'block';
+            document.getElementById('exitResult').style.display = 'none';
+            document.getElementById('exitReceipt').style.display = 'none';
+        }
+
+        function simulateQRScan() {
+            const active = state.tickets.filter(t => t.status === 'ACTIVE');
+            if (active.length === 0) {
+                showToast('Nenhum veículo estacionado.', 'error');
+                return;
+            }
+            showExitResult(active[0]);
+        }
+
+        function searchByTicket() {
+            const num = parseInt(document.getElementById('exitTicketNumber').value);
+            if (isNaN(num)) {
+                showToast('Digite o número do ticket.', 'error');
+                return;
+            }
+            const ticket = state.tickets.find(t => t.ticketNumber === num && t.status === 'ACTIVE');
+            if (!ticket) {
+                showToast('Ticket não encontrado ou já finalizado.', 'error');
+                return;
+            }
+            showExitResult(ticket);
+        }
+
+        function searchByPlate() {
+            const plate = document.getElementById('exitPlate').value.trim().toUpperCase();
+            if (!plate) {
+                showToast('Digite a placa.', 'error');
+                return;
+            }
+            const ticket = state.tickets.find(t => t.licensePlate === plate && t.status === 'ACTIVE');
+            if (!ticket) {
+                showToast('Veículo não encontrado ou já finalizado.', 'error');
+                return;
+            }
+            showExitResult(ticket);
+        }
+
+        function showExitResult(ticket) {
+            currentExitTicket = ticket;
+            document.getElementById('exitResult').style.display = 'block';
+            document.getElementById('exitReceipt').style.display = 'none';
+
+            const isSalao = ticket.isSalao || false;
+            const prefix = isSalao ? 'S-' : '';
+            document.getElementById('exitTicketNum').textContent = prefix + String(ticket.ticketNumber).padStart(4, '0');
+            document.getElementById('exitPlateResult').textContent = ticket.licensePlate;
+
+            const entryDate = new Date(ticket.entryDateTime);
+            document.getElementById('exitEntryTime').textContent = entryDate.toLocaleString('pt-BR');
+
+            const now = new Date();
+            const diffMs = now - entryDate;
+            const diffMin = Math.floor(diffMs / 60000);
+            const hours = Math.floor(diffMin / 60);
+            const mins = diffMin % 60;
+            document.getElementById('exitDuration').textContent = `${hours}h ${mins}min`;
+
+            let value = state.rates['1h'] || 25;
+            if (diffMin > 60 && diffMin <= 720) {
+                const addHours = Math.ceil((diffMin - 60) / 60);
+                value = state.rates['1h'] + addHours * (state.rates['add'] || 10);
+            } else if (diffMin > 720) {
+                value = state.rates['12h'] || 40;
+            }
+            document.getElementById('exitParkingValue').textContent = value.toFixed(2);
+            document.getElementById('exitTotalValue').textContent = value.toFixed(2);
+
+            // Fotos
+            const photosContainer = document.getElementById('exitPhotos');
+            photosContainer.innerHTML = '<strong>📸 Fotos do veículo:</strong>';
+            const photoDiv = document.createElement('div');
+            photoDiv.className = 'photo-list';
+
+            if (ticket.photos && ticket.photos.length > 0) {
+                ticket.photos.forEach((photoUrl, index) => {
+                    const thumb = document.createElement('div');
+                    thumb.className = 'photo-thumb';
+                    const img = document.createElement('img');
+                    img.src = photoUrl;
+                    img.alt = `Foto ${index + 1}`;
+                    thumb.appendChild(img);
+                    photoDiv.appendChild(thumb);
+                });
+            } else {
+                const placeholder = document.createElement('div');
+                placeholder.className = 'photo-thumb';
+                placeholder.innerHTML = '<div style="font-size:12px;color:#94a3b8;">Sem foto</div>';
+                photoDiv.appendChild(placeholder);
+            }
+            photosContainer.appendChild(photoDiv);
+
+            // Serviços
+            const container = document.getElementById('exitServicesList');
+            container.innerHTML = '';
+            state.services.forEach(s => {
+                const label = document.createElement('label');
+                label.style.display = 'block';
+                label.style.marginBottom = '4px';
+                label.innerHTML = `
+                    <input type="checkbox" data-service-id="${s.id}" data-value="${s.value}" onchange="updateExitTotal()">
+                    ${s.name} - R$ ${s.value.toFixed(2)}
+                `;
+                container.appendChild(label);
+            });
+        }
+
+        function updateExitTotal() {
+            const base = parseFloat(document.getElementById('exitParkingValue').textContent) || 0;
+            let extra = 0;
+            document.querySelectorAll('#exitServicesList input[type="checkbox"]:checked').forEach(cb => {
+                extra += parseFloat(cb.dataset.value) || 0;
+            });
+            document.getElementById('exitTotalValue').textContent = (base + extra).toFixed(2);
+        }
+
+        function confirmExit() {
+            if (!currentExitTicket) {
+                showToast('Nenhum veículo selecionado.', 'error');
+                return;
+            }
+
+            const method = document.getElementById('exitPaymentMethod').value;
+            const total = parseFloat(document.getElementById('exitTotalValue').textContent) || 0;
+            const parking = parseFloat(document.getElementById('exitParkingValue').textContent) || 0;
+            const serviceTotal = total - parking;
+
+            const selectedServices = [];
+            document.querySelectorAll('#exitServicesList input[type="checkbox"]:checked').forEach(cb => {
+                const id = parseInt(cb.dataset.serviceId);
+                const service = state.services.find(s => s.id === id);
+                if (service) selectedServices.push(service);
+            });
+
+            const ticket = currentExitTicket;
+            ticket.exitDateTime = new Date().toISOString();
+            ticket.status = 'CLOSED';
+            ticket.servicesApplied = selectedServices.map(s => s.id);
+
+            const payment = {
+                id: Date.now(),
+                ticketId: ticket.id,
+                method: method,
+                amount: total,
+                parkingAmount: parking,
+                serviceAmount: serviceTotal,
+                dateTime: new Date().toISOString(),
+                servicesApplied: selectedServices.map(s => s.id)
+            };
+
+            state.payments.push(payment);
+            saveState();
+
+            const entryDate = new Date(ticket.entryDateTime);
+            const exitDate = new Date(ticket.exitDateTime);
+            const diff = exitDate - entryDate;
+            const hours = Math.floor(diff / 3600000);
+            const mins = Math.floor((diff % 3600000) / 60000);
+
+            const isSalao = ticket.isSalao || false;
+            const prefix = isSalao ? 'S-' : '';
+            const salaoStamp = isSalao ? '\n  ✦ SELO SALÃO AUTENTICADO ✦' : '';
+
+            const receiptText = `
+        ═════════════════════════════════
+          ${isSalao ? '🏪 SALÃO ' : ''}${state.config.name || 'Estacionamento Jurupis'}
+          ${state.config.cnpj || ''}
+          ${state.config.address || ''}
+          Tel: ${state.config.phone1 || ''}
+        ═════════════════════════════════
+        
+          TICKET: ${prefix}${String(ticket.ticketNumber).padStart(4, '0')}
+          PLACA: ${ticket.licensePlate}
+          ENTRADA: ${entryDate.toLocaleTimeString('pt-BR', {hour:'2-digit',minute:'2-digit'})}
+          SAÍDA: ${exitDate.toLocaleTimeString('pt-BR', {hour:'2-digit',minute:'2-digit'})}
+          TEMPO: ${hours}h ${mins}min
+          PAGAMENTO: ${method}
+          VALOR: R$ ${total.toFixed(2)}
+          ${selectedServices.length > 0 ? 'SERVIÇOS: ' + selectedServices.map(s => s.name).join(', ') : ''}
+          ${salaoStamp}
+        
+        ═════════════════════════════════
+          Obrigado pela preferência!`;
+
+            document.getElementById('exitReceiptText').textContent = receiptText;
+            document.getElementById('exitReceipt').style.display = 'block';
+            document.getElementById('exitResult').style.display = 'none';
+
+            document.getElementById('exitTicketNumber').value = '';
+            document.getElementById('exitPlate').value = '';
+
+            updateUI();
+            showToast(`Saída do veículo ${ticket.licensePlate} registrada com sucesso!`, 'success');
+        }
+
+        // ============================================================
+        // HISTÓRICO
+        // ============================================================
+        function renderHistory() {
+            const list = getFilteredHistory();
+            const container = document.getElementById('historyList');
+
+            if (list.length === 0) {
+                container.innerHTML =
+                    '<div style="text-align:center; color:#94a3b8; padding:40px 20px;"><i class="fas fa-inbox" style="font-size:32px;display:block;margin-bottom:8px;"></i>Nenhum registro encontrado.</div>';
+                document.getElementById('historyTotalCount').textContent = '0';
+                document.getElementById('historyTotalValue').textContent = 'R$ 0,00';
+                return;
+            }
+
+            container.innerHTML = '';
+            let totalValue = 0;
+
+            list.forEach(p => {
+                const ticket = state.tickets.find(t => t.id === p.ticketId);
+                if (!ticket) return;
+                totalValue += p.amount;
+
+                const isSalao = ticket.isSalao || false;
+                const prefix = isSalao ? 'S-' : '';
+                const salaoBadge = isSalao ? ' <span style="background:#8b5cf6;color:white;font-size:9px;padding:1px 8px;border-radius:30px;font-weight:600;">✦ SALÃO</span>' :
+                    '';
+
+                const div = document.createElement('div');
+                div.className = 'history-item';
+                div.innerHTML = `
+                    <div class="info">
+                        <strong>#${prefix}${String(ticket.ticketNumber).padStart(4, '0')} - ${ticket.licensePlate} ${salaoBadge}</strong>
+                        <span>${new Date(ticket.entryDateTime).toLocaleDateString('pt-BR')} ${new Date(ticket.entryDateTime).toLocaleTimeString('pt-BR', {hour:'2-digit',minute:'2-digit'})}</span>
+                        ${ticket.exitDateTime ? `<span>Saída: ${new Date(ticket.exitDateTime).toLocaleTimeString('pt-BR', {hour:'2-digit',minute:'2-digit'})}</span>` : ''}
+                    </div>
+                    <div style="text-align:right;">
+                        <div class="value">R$ ${p.amount.toFixed(2)}</div>
+                        <div style="font-size:10px;color:#94a3b8;">${p.method}</div>
+                    </div>
+                `;
+                container.appendChild(div);
+            });
+
+            document.getElementById('historyTotalCount').textContent = list.length;
+            document.getElementById('historyTotalValue').textContent = `R$ ${totalValue.toFixed(2)}`;
+        }
+
+        function getFilteredHistory() {
+            let filtered = [...state.payments];
+
+            if (currentHistoryFilter === 'today') {
+                const today = new Date().toISOString().split('T')[0];
+                filtered = filtered.filter(p => p.dateTime && p.dateTime.startsWith(today));
+            } else if (currentHistoryFilter === 'week') {
+                const weekAgo = new Date();
+                weekAgo.setDate(weekAgo.getDate() - 7);
+                filtered = filtered.filter(p => new Date(p.dateTime) >= weekAgo);
+            } else if (currentHistoryFilter === 'month') {
+                const monthAgo = new Date();
+                monthAgo.setMonth(monthAgo.getMonth() - 1);
+                filtered = filtered.filter(p => new Date(p.dateTime) >= monthAgo);
+            }
+
+            filtered.sort((a, b) => new Date(b.dateTime) - new Date(a.dateTime));
+            return filtered;
+        }
+
+        function filterHistory(period) {
+            currentHistoryFilter = period;
+            renderHistory();
+        }
+
+        function searchHistory() {
+            const query = document.getElementById('historySearch').value.trim().toUpperCase();
+            if (!query) {
+                renderHistory();
+                return;
+            }
+
+            const filtered = state.payments.filter(p => {
+                const ticket = state.tickets.find(t => t.id === p.ticketId);
+                if (!ticket) return false;
+                return String(ticket.ticketNumber).includes(query) ||
+                    ticket.licensePlate.includes(query);
+            });
+
+            const container = document.getElementById('historyList');
+            if (filtered.length === 0) {
+                container.innerHTML =
+                    '<div style="text-align:center; color:#94a3b8; padding:40px 20px;">Nenhum resultado encontrado.</div>';
+                document.getElementById('historyTotalCount').textContent = '0';
+                document.getElementById('historyTotalValue').textContent = 'R$ 0,00';
+                return;
+            }
+
+            container.innerHTML = '';
+            let totalValue = 0;
+            filtered.forEach(p => {
+                const ticket = state.tickets.find(t => t.id === p.ticketId);
+                if (!ticket) return;
+                totalValue += p.amount;
+                const isSalao = ticket.isSalao || false;
+                const prefix = isSalao ? 'S-' : '';
+                const div = document.createElement('div');
+                div.className = 'history-item';
+                div.innerHTML = `
+                    <div class="info">
+                        <strong>#${prefix}${String(ticket.ticketNumber).padStart(4, '0')} - ${ticket.licensePlate}</strong>
+                        <span>${new Date(ticket.entryDateTime).toLocaleDateString('pt-BR')}</span>
+                    </div>
+                    <div style="text-align:right;">
+                        <div class="value">R$ ${p.amount.toFixed(2)}</div>
+                        <div style="font-size:10px;color:#94a3b8;">${p.method}</div>
+                    </div>
+                `;
+                container.appendChild(div);
+            });
+            document.getElementById('historyTotalCount').textContent = filtered.length;
+            document.getElementById('historyTotalValue').textContent = `R$ ${totalValue.toFixed(2)}`;
+        }
+
+        // ============================================================
+        // RELATÓRIOS E IMPRESSÃO
+        // ============================================================
+        function printReport() {
+            const list = getFilteredHistory();
+            if (list.length === 0) {
+                showToast('Nenhum registro para imprimir.', 'error');
+                return;
+            }
+
+            let text = `${state.config.name || 'Estacionamento Jurupis'}\n`;
+            text += `RELATÓRIO DE HISTÓRICO\n`;
+            text += `${new Date().toLocaleDateString('pt-BR')}\n`;
+            text += `${'='.repeat(30)}\n\n`;
+
+            let total = 0;
+            list.forEach(p => {
+                const ticket = state.tickets.find(t => t.id === p.ticketId);
+                if (!ticket) return;
+                total += p.amount;
+                const isSalao = ticket.isSalao || false;
+                const prefix = isSalao ? 'S-' : '';
+                text += `#${prefix}${String(ticket.ticketNumber).padStart(4, '0')} ${ticket.licensePlate}`;
+                if (isSalao) text += ' [SALÃO]';
+                text += `\n  ${new Date(ticket.entryDateTime).toLocaleDateString('pt-BR')} `;
+                text += `${new Date(ticket.entryDateTime).toLocaleTimeString('pt-BR', {hour:'2-digit',minute:'2-digit'})}\n`;
+                text += `  R$ ${p.amount.toFixed(2)} - ${p.method}\n\n`;
+            });
+
+            text += `${'='.repeat(30)}\n`;
+            text += `TOTAL: R$ ${total.toFixed(2)}`;
+
+            showPrintDialog(text, 'Relatório de Histórico');
+        }
+
+        function printCashReport() {
+            const total = state.payments.reduce((acc, p) => acc + p.amount, 0);
+            const methods = { DINHEIRO: 0, PIX: 0, CREDITO: 0, DEBITO: 0 };
+            state.payments.forEach(p => {
+                if (methods[p.method] !== undefined) methods[p.method] += p.amount;
+            });
+
+            let text = `${state.config.name || 'Estacionamento Jurupis'}\n`;
+            text += `RELATÓRIO DE CAIXA\n`;
+            text += `${new Date().toLocaleDateString('pt-BR')}\n`;
+            text += `${'='.repeat(30)}\n\n`;
+            text += `Total recebido: R$ ${total.toFixed(2)}\n`;
+            text += `Dinheiro: R$ ${methods.DINHEIRO.toFixed(2)}\n`;
+            text += `PIX: R$ ${methods.PIX.toFixed(2)}\n`;
+            text += `Crédito: R$ ${methods.CREDITO.toFixed(2)}\n`;
+            text += `Débito: R$ ${methods.DEBITO.toFixed(2)}\n`;
+            text += `Veículos estacionados: ${state.tickets.filter(t => t.status === 'ACTIVE').length}\n`;
+            text += `Total de atendimentos: ${state.payments.length}`;
+
+            showPrintDialog(text, 'Relatório de Caixa');
+        }
+
+        function showPrintDialog(text, title) {
+            const dialog = document.createElement('div');
+            dialog.style.cssText = `
+                position:fixed;top:0;left:0;width:100%;height:100%;
+                background:rgba(0,0,0,0.5);
+                display:flex;align-items:center;justify-content:center;
+                z-index:99999;padding:20px;
+            `;
+
+            const content = document.createElement('div');
+            content.style.cssText = `
+                background:white;border-radius:20px;padding:24px;
+                max-width:400px;width:100%;max-height:80vh;
+                overflow-y:auto;
+            `;
+            content.innerHTML = `
+                <h3 style="margin-bottom:12px;">${title}</h3>
+                <div style="background:#f1f5f9;border-radius:12px;padding:16px;font-family:monospace;font-size:13px;white-space:pre-wrap;word-break:break-all;margin-bottom:16px;">${text}</div>
+                <div style="display:flex;gap:8px;">
+                    <button class="btn btn-primary btn-sm" onclick="this.closest('div[style]').remove();showToast('Imprimindo...','success')">
+                        <i class="fas fa-print"></i> Imprimir
+                    </button>
+                    <button class="btn btn-sm btn-outline" onclick="this.closest('div[style]').remove()">
+                        <i class="fas fa-times"></i> Fechar
+                    </button>
+                </div>
+            `;
+
+            dialog.appendChild(content);
+            document.body.appendChild(dialog);
+
+            dialog.onclick = (e) => {
+                if (e.target === dialog) dialog.remove();
+            };
+        }
+
+        function printClosure() {
+            showToast('Imprimindo fechamento...', 'success');
+        }
+
+        // ============================================================
+        // CAIXA - FECHAMENTOS
+        // ============================================================
+        function showDailyClosure() {
+            const today = new Date().toISOString().split('T')[0];
+            const todayPayments = state.payments.filter(p => p.dateTime && p.dateTime.startsWith(today));
+
+            if (todayPayments.length === 0) {
+                showToast('Nenhum movimento hoje para fechar.', 'error');
+                return;
+            }
+
+            const total = todayPayments.reduce((acc, p) => acc + p.amount, 0);
+            const methods = { DINHEIRO: 0, PIX: 0, CREDITO: 0, DEBITO: 0 };
+            todayPayments.forEach(p => {
+                if (methods[p.method] !== undefined) methods[p.method] += p.amount;
+            });
+
+            const salaoCount = todayPayments.filter(p => {
+                const ticket = state.tickets.find(t => t.id === p.ticketId);
+                return ticket && ticket.isSalao;
+            }).length;
+
+            const text = `FECHAMENTO DO DIA - ${new Date().toLocaleDateString('pt-BR')}
+        ${'='.repeat(30)}
+        Total de saídas: ${todayPayments.length}
+        Saídas Salão: ${salaoCount}
+        Estacionamento: R$ ${todayPayments.reduce((a,p) => a + p.parkingAmount, 0).toFixed(2)}
+        Serviços: R$ ${todayPayments.reduce((a,p) => a + p.serviceAmount, 0).toFixed(2)}
+        PIX: R$ ${methods.PIX.toFixed(2)}
+        Dinheiro: R$ ${methods.DINHEIRO.toFixed(2)}
+        Crédito: R$ ${methods.CREDITO.toFixed(2)}
+        Débito: R$ ${methods.DEBITO.toFixed(2)}
+        ${'='.repeat(30)}
+        TOTAL: R$ ${total.toFixed(2)}`;
+
+            document.getElementById('closureTitle').textContent = 'Fechamento do Dia';
+            document.getElementById('closureText').textContent = text;
+            document.getElementById('closureResult').style.display = 'block';
+
+            const closure = {
+                id: Date.now(),
+                type: 'daily',
+                date: today,
+                total: total,
+                data: text,
+                salaoCount: salaoCount
+            };
+            if (!state.closures) state.closures = [];
+            state.closures.push(closure);
+            saveState();
+
+            showToast('Fechamento do dia gerado!', 'success');
+        }
+
+        function showMonthlyClosure() {
+            const now = new Date();
+            const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
+            const monthEnd = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+
+            const monthPayments = state.payments.filter(p => {
+                const date = new Date(p.dateTime);
+                return date >= monthStart && date <= monthEnd;
+            });
+
+            if (monthPayments.length === 0) {
+                showToast('Nenhum movimento neste mês.', 'error');
+                return;
+            }
+
+            const total = monthPayments.reduce((acc, p) => acc + p.amount, 0);
+            const methods = { DINHEIRO: 0, PIX: 0, CREDITO: 0, DEBITO: 0 };
+            monthPayments.forEach(p => {
+                if (methods[p.method] !== undefined) methods[p.method] += p.amount;
+            });
+
+            const salaoCount = monthPayments.filter(p => {
+                const ticket = state.tickets.find(t => t.id === p.ticketId);
+                return ticket && ticket.isSalao;
+            }).length;
+
+            const text = `FECHAMENTO DO MÊS - ${now.toLocaleString('pt-BR', { month: 'long', year: 'numeric' })}
+        ${'='.repeat(30)}
+        Total de atendimentos: ${monthPayments.length}
+        Atendimentos Salão: ${salaoCount}
+        Veículos: ${state.tickets.filter(t => t.status === 'CLOSED' && new Date(t.exitDateTime) >= monthStart && new Date(t.exitDateTime) <= monthEnd).length}
+        Estacionamento: R$ ${monthPayments.reduce((a,p) => a + p.parkingAmount, 0).toFixed(2)}
+        Serviços: R$ ${monthPayments.reduce((a,p) => a + p.serviceAmount, 0).toFixed(2)}
+        PIX: R$ ${methods.PIX.toFixed(2)}
+        Dinheiro: R$ ${methods.DINHEIRO.toFixed(2)}
+        Crédito: R$ ${methods.CREDITO.toFixed(2)}
+        Débito: R$ ${methods.DEBITO.toFixed(2)}
+        ${'='.repeat(30)}
+        FATURAMENTO TOTAL: R$ ${total.toFixed(2)}`;
+
+            document.getElementById('closureTitle').textContent = 'Fechamento do Mês';
+            document.getElementById('closureText').textContent = text;
+            document.getElementById('closureResult').style.display = 'block';
+
+            const closure = {
+                id: Date.now(),
+                type: 'monthly',
+                date: now.toISOString().split('T')[0],
+                month: now.getMonth(),
+                year: now.getFullYear(),
+                total: total,
+                data: text,
+                salaoCount: salaoCount
+            };
+            if (!state.closures) state.closures = [];
+            state.closures.push(closure);
+            saveState();
+
+            showToast('Fechamento do mês gerado!', 'success');
+        }
+
+        // ============================================================
+        // IMPRESSÃO
+        // ============================================================
+        function printTicket(type) {
+            if (!printerConnected) {
+                showToast('⚠️ Impressora não conectada. Clique em "Conectar" em Gestão > Impressora.', 'error');
+                return;
+            }
+
+            if (type === 'entry') {
+                showToast('🖨️ Imprimindo ticket de entrada na ' + printerName + '...', 'success');
+            } else if (type === 'exit') {
+                showToast('🖨️ Imprimindo comprovante de saída na ' + printerName + '...', 'success');
+            } else if (type === 'salao') {
+                showToast('🖨️ Imprimindo ticket do Salão com selo de autenticidade na ' + printerName + '... ✦', 'success');
+            }
+        }
+
+        function testPrint() {
+            if (!printerConnected) {
+                showToast('⚠️ Impressora não conectada. Clique em "Conectar" em Gestão > Impressora.', 'error');
+                return;
+            }
+            showToast('✅ Teste de impressão realizado com sucesso na ' + printerName + '!', 'success');
+        }
+
+        // ============================================================
+        // GESTÃO - CONFIGURAÇÕES
+        // ============================================================
+        function switchSettingsTab(tab) {
+            document.querySelectorAll('#screen-settings .tab').forEach(el => el.classList.remove('active'));
+            document.querySelector(`#screen-settings .tab[data-tab="set-${tab}"]`).classList.add('active');
+            document.querySelectorAll('.settings-tab').forEach(el => el.style.display = 'none');
+            document.getElementById(`setTab-${tab}`).style.display = 'block';
+        }
+
+        function saveConfig() {
+            state.config.name = document.getElementById('setName').value;
+            state.config.cnpj = document.getElementById('setCnpj').value;
+            state.config.address = document.getElementById('setAddress').value;
+            state.config.phone1 = document.getElementById('setPhone1').value;
+            state.config.phone2 = document.getElementById('setPhone2').value;
+            saveState();
+            document.querySelector('.main-header h1').textContent = state.config.name || 'Estacionamento Jurupis';
+            showToast('Dados salvos com sucesso!', 'success');
+        }
+
+        function saveRates() {
+            state.rates['1h'] = parseFloat(document.getElementById('rate1h').value) || 25;
+            state.rates['add'] = parseFloat(document.getElementById('rateAdd').value) || 10;
+            state.rates['12h'] = parseFloat(document.getElementById('rate12h').value) || 40;
+            saveState();
+            showToast('Tarifas salvas com sucesso!', 'success');
+        }
+
+        function addServiceField() {
+            const container = document.getElementById('servicesList');
+            const div = document.createElement('div');
+            div.style.display = 'flex';
+            div.style.gap = '6px';
+            div.style.alignItems = 'center';
+            div.style.marginBottom = '6px';
+            div.innerHTML = `
+                <input type="text" placeholder="Nome" style="flex:2;">
+                <input type="number" placeholder="R$" step="0.01" style="flex:1;">
+                <button class="btn btn-xs" style="width:auto; background:#e2e8f0; color:#475569;" onclick="removeService(this)"><i class="fas fa-trash"></i></button>
+            `;
+            container.appendChild(div);
+        }
+
+        function removeService(btn) {
+            btn.parentElement.remove();
+        }
+
+        function saveServices() {
+            const items = document.querySelectorAll('#servicesList > div');
+            const newServices = [];
+            items.forEach(div => {
+                const inputs = div.querySelectorAll('input');
+                if (inputs.length >= 2) {
+                    const name = inputs[0].value.trim();
+                    const value = parseFloat(inputs[1].value);
+                    if (name && !isNaN(value)) {
+                        newServices.push({ id: Date.now() + Math.random(), name, value });
+                    }
+                }
+            });
+            state.services = newServices;
+            saveState();
+            showToast('Serviços salvos com sucesso!', 'success');
+        }
+
+        // ============================================================
+        // INICIALIZAÇÃO
+        // ============================================================
+        init();
+
+        switchExitTab('qr');
+        switchSettingsTab('printer');
+
+        setInterval(updateUI, 30000);
+
+        console.log('🚗 Estacionamento Jurupis - Sistema Offline');
+        console.log(`📊 ${state.tickets.length} tickets, ${state.payments.length} pagamentos`);
+        console.log('💾 Dados salvos localmente no localStorage');
+        console.log('✅ Sistema pronto para uso!');
+        console.log(`🖨️ Impressora padrão: ${PRINTER_NAME} - MAC: ${PRINTER_MAC}`);
+        console.log('📱 Clique em "Adicionar Outra" para cadastrar novas impressoras');
+        console.log('📸 Câmera usando input file com captura - compatível com WebView!');
+    </script>
+</body>
+</html>
